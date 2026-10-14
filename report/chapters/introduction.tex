@@ -1,0 +1,62 @@
+\section{Introduction}
+\label{sec:introduction}
+3D Printers have the basic task of extruding filament at a given x, y, z
+coordinate at time t. The mechanism that achieves that movement
+determines the machine's costs, print quality, and robustness. Out of
+many different options, the Core XY mechanism is a popular choice
+for modern printers. Different than Cartesian designs, where one
+motor drives one axis, here each motor simultaneously changes the
+x and y position of the tool head (see Figure~\ref{fig:printer_schematic}).
+This results in a more complex kinematic model, but allows a more sturdy
+casing and faster printing speeds. Our task is to model and simulate the system.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\textwidth]{printer_sch.png}
+  \caption{Schematic of the Core XY mechanism.}
+  \label{fig:printer_schematic}
+\end{figure}
+
+\subsection{Symbol table}
+\label{sec:symbol_table}
+
+\begin{table}[H]
+  \centering
+  \caption{Symbols and parameter values.}
+  \label{tab:symbols}
+  \begin{tabular}{llr}
+    \toprule
+    Description & Symbol & Value \\
+    \midrule
+    Motor angle left                  & $\theta_l$      & -- \\
+    Motor voltage left                & $u_{m,l}$       & -- \\
+    Motor current left                & $i_{m,l}$       & -- \\
+    Motor radius                      & $r_m$           & \qty{11}{\milli\metre} \\
+    Motor induction                   & $L_m$           & \qty{10}{\milli\henry} \\
+    Motor resistor                    & $R_m$           & \qty{90}{\ohm} \\
+    Motor inertia                     & $J_m$           & \qty{8e-6}{\kilogram\metre\squared} \\
+    Motor constant                    & $K_m$           & \qty{0.07}{\newton\metre\per\ampere} \\
+    \midrule
+    Tool head position                & $x$, $y$        & -- \\
+    Tool head mass                    & $m$             & \qty{60}{\gram} \\
+    \midrule
+    Nozzle voltage                    & $u_n$           & -- \\
+    Nozzle current                    & $i_n$           & -- \\
+    Nozzle capacitor                  & $C_n$           & -- \\
+    Nozzle thermal capacity           & $C_{t,n}$       & -- \\
+    Nozzle thermal resistance         & $R_{t,n}$       & \qty{9}{\kelvin\per\watt} \\
+    Nozzle resistor                   & $R_n$           & \qty{8}{\ohm} \\
+    Nozzle temperature                & $T_n$           & \qty{240}{\degreeCelsius} \\
+    Environmental temperature         & $T_e$           & \qty{300}{\kelvin} \\
+    \midrule
+    Bearing friction rolling          & $\mu_r$         & \qty{0.003}{\newton\second\per\metre} \\
+    Bearing friction linear $x$-direction & $\mu_{l,x}$ & \qty{0.002}{\newton\second\per\metre} \\
+    Bearing friction linear $y$-direction & $\mu_{l,y}$ & \qty{0.001}{\newton\second\per\metre} \\
+    Bearing radius                        & $r_b$       & \qty{3}{\milli\metre} \\
+    \midrule
+    Print bed temperature             & $T_b$           & \qty{105}{\degreeCelsius} \\
+    Print area dimension $x$          & $d_x$           & \qty{29}{\centi\metre} \\
+    Print area dimension $y$          & $d_y$           & \qty{29}{\centi\metre} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
