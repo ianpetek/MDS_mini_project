@@ -2,4 +2,105 @@
 \label{sec:physical_modelling}
 
 \subsection{Kinematics}
+First task is to derive the direct kinematics of the Core XY mechanism. One fact that slightly complcates this is the fact that rotating one motor will move the tool head in both $x$ and $y$ directions. By removing the right motor, we can see that by moving the tool head in the positive $x$ direction \textbf{or} in the positive $y$ direction, the left motor will rotate in the positive direction. We can draw similar conclusions for the right motor, for which we get the following equatons:
 
+\begin{equation}
+\begin{aligned}
+\Delta A &= \Delta x + \Delta y \\
+\Delta B &= \Delta x - \Delta y \\
+\Delta x &= \frac{\Delta A + \Delta B}{2} \\
+\Delta y &= \frac{\Delta A - \Delta B}{2}
+\end{aligned}
+\tag{1}
+\end{equation}
+
+With $\Delta A$ and $\Delta B$ being the length of belt moved by the motors, and $\Delta x$ and $\Delta y$ being the change in position of the tool head.
+
+\begin{equation}
+\begin{aligned}
+\Delta A &= r_m \, \theta_L \\
+\Delta B &= r_m \, \theta_R
+\end{aligned}
+\tag{2}
+\end{equation}
+
+If we assume that in the beginning the motors are at
+$\theta_L = \theta_R = 0$ and the cart is at $(0, 0)$, we get the following equations:
+
+
+
+\begin{equation}
+\begin{aligned}
+x(\theta_L, \theta_R) &= \frac{r_m \theta_L + r_m \theta_R}{2}
+  = \frac{r_m}{2} \left( \theta_L + \theta_R \right) \\
+y(\theta_L, \theta_R) &= \frac{r_m \theta_L - r_m \theta_R}{2}
+  = \frac{r_m}{2} \left( \theta_L - \theta_R \right)
+\end{aligned}
+\tag{3}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\dot{x}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L + \dot{\theta}_R \right) \\
+\dot{y}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L - \dot{\theta}_R \right)
+\end{aligned}
+\end{equation}
+
+\subsection{Dynamics}
+In next part we model the dynamics of the 3D printer system by applying the Euler-Lagrange equation. Additionally, we will split the problem to a mechanical and an electrical one, with the angular velocity of the motor shafts connecting them. 
+
+Because of that, we choose generalized coordinates:
+\[
+q = \begin{bmatrix} x \\ y \\ q_A \\ q_B \end{bmatrix}
+\qquad
+\dot q = \begin{bmatrix} \dot x \\ \dot y \\ i_A \\ i_B \end{bmatrix}
+\]
+We can also then split them among our two problems:
+\[
+\dot q_m = \begin{bmatrix} \dot x \\ \dot y \end{bmatrix} \ \text{(mechanical part)},
+\qquad
+\dot q_e = \begin{bmatrix} i_A \\ i_B \end{bmatrix} \ \text{(electrical part)}
+\]
+
+\subsubsection*{Kinetic energy -- mechanical part}
+\[
+\boxed{K_m = \tfrac{1}{2}\,\dot q_m^\top M\, \dot q_m}
+\quad\Rightarrow\quad
+M = \begin{bmatrix} m & 0 \\ 0 & m \end{bmatrix}
+\]
+$\Rightarrow$ No potential.
+
+\subsubsection*{Dissipative}
+
+4 rotational bearings for each roller. Define $r_b$ as the bearing radius:
+\[
+\theta_L = \frac{\Delta x + \Delta y}{r_b},
+\qquad
+\theta_R = \frac{\Delta x - \Delta y}{r_b}
+\]
+\begin{align*}
+D_L &= \tfrac{1}{2}\,\dot\theta_L^\top D\,\dot\theta_L
+     = \tfrac{1}{2}\cdot 4\cdot \dot\theta_L^2\,\mu_r
+     = 2\,\dot\theta_L^2\,\mu_r \\
+    &= 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
+D_R &= 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
+\end{align*}
+\[
+\boxed{D_{\mathrm{rot}} = 4\,\frac{\mu_r}{r_b^2}\left[\dot x^2 + \dot y^2\right]}
+\]
+\[
+D_{\mathrm{lin}} = \tfrac{1}{2}\,\dot q_m^\top B\,\dot q_m
+= \tfrac{1}{2}\mu_{L,x}\,\dot x^2 + \tfrac{1}{2}\mu_{L,y}\,\dot y^2
+\]
+\[
+D_m = \left[4\,\frac{\mu_r}{r_b^2} + \tfrac{1}{2}\mu_{L,x}\right]\dot x^2
+    + \left[4\,\frac{\mu_r}{r_b^2} + \tfrac{1}{2}\mu_{L,y}\right]\dot y^2
+\]
+\[
+B = \begin{bmatrix}
+8\,\dfrac{\mu_r}{r_b^2} + \mu_{L,x} & 0 \\[2ex]
+0 & 8\,\dfrac{\mu_r}{r_b^2} + \mu_{L,y}
+\end{bmatrix},
+\qquad
+\boxed{D_m = \tfrac{1}{2}\,\dot q_m^\top B\,\dot q_m}
+\]
