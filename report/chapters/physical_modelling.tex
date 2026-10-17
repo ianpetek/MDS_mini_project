@@ -76,7 +76,7 @@ K_{mech} = \tfrac{1}{2} m (\dot x^2 + \dot y^2)
 As the whole system is planar, we can see that there is no potential energy terms as it will be constant.
 
 \subsubsection*{Dissipative energy}
-Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
+Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system, two along each axis. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
 \begin{equation}
 \label{eq:inverse_kinematics}
 \theta_{b,L} = \frac{ x +  y}{r_b},
@@ -103,15 +103,15 @@ Then simply combining them:
 Similarly, we get the linear dissipative energy:
 \begin{equation*}
 \label{eq:dissipation_lin}
-D_{\mathrm{lin}} = 4\tfrac{1}{2}\mu_{l,x}\,\dot x^2 + 4 \tfrac{1}{2}\mu_{l,y}\,\dot y^2
+D_{\mathrm{lin}} = 2\cdot\tfrac{1}{2}\mu_{l,x}\,\dot x^2 + 2\cdot\tfrac{1}{2}\mu_{l,y}\,\dot y^2 = \mu_{l,x}\,\dot x^2 + \mu_{l,y}\,\dot y^2
 \end{equation*}
 
 Then, combining the terms we get:
 
 \begin{equation}
 \label{eq:dissipation_mech}
-D_m = \left[4\,\frac{\mu_r}{r_b^2} + 2\mu_{l,x}\right]\dot x^2
-    + \left[4\,\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right]\dot y^2
+D_m = \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,x}\right]\dot x^2
+    + \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
 \end{equation}
 
 \clearpage
@@ -178,8 +178,8 @@ m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 0 & 0 & 0 & L_m
 \end{bmatrix} \\
 \mathbf{N} &= \begin{bmatrix}
-8\dfrac{\mu_r}{r_b^2} + 4\mu_{l,x} & 0 & 0 & 0 \\
-0 & 8\dfrac{\mu_r}{r_b^2} + 4\mu_{l,y} & 0 & 0 \\
+8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,x} & 0 & 0 & 0 \\
+0 & 8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,y} & 0 & 0 \\
 0 & 0 & R_m & 0 \\
 0 & 0 & 0 & R_m
 \end{bmatrix}
@@ -256,10 +256,10 @@ Expanding back out of matrix form we get:
 \begin{equation*}
 \begin{aligned}
 \left(m + J_m\frac{2}{r_m^2}\right)\ddot x
-  + \left(8\frac{\mu_r}{r_b^2} + 4\mu_{l,x}\right)\dot x
+  + \left(8\frac{\mu_r}{r_b^2} + 2\mu_{l,x}\right)\dot x
   - \frac{K_m}{r_m} i_L - \frac{K_m}{r_m} i_R &= 0 \\
 \left(m + J_m\frac{2}{r_m^2}\right)\ddot y
-  + \left(8\frac{\mu_r}{r_b^2} + 4\mu_{l,y}\right)\dot y
+  + \left(8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right)\dot y
   - \frac{K_m}{r_m} i_L + \frac{K_m}{r_m} i_R &= 0 \\
 L_m \frac{di_L}{dt} + R_m i_L + \frac{K_m}{r_m}\dot x + \frac{K_m}{r_m}\dot y - u_{m,L} &= 0 \\
 L_m \frac{di_R}{dt} + R_m i_R + \frac{K_m}{r_m}\dot x - \frac{K_m}{r_m}\dot y - u_{m,R} &= 0
@@ -271,9 +271,9 @@ Or with substitutions, we get final form of the four differential equations:
 \begin{equation*}
 m_{eq} = m + \frac{2J_m}{r_m^2},
 \qquad
-b_x = 8\frac{\mu_r}{r_b^2} + 4\mu_{l,x},
+b_x = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,x},
 \qquad
-b_y = 8\frac{\mu_r}{r_b^2} + 4\mu_{l,y}
+b_y = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}
 \end{equation*}
 
 \begin{equation}
