@@ -2,26 +2,26 @@
 \label{sec:physical_modelling}
 
 \subsection{Kinematics}
-First task is to derive the direct kinematics of the Core XY mechanism. One fact that slightly complcates this is the fact that rotating one motor will move the tool head in both $x$ and $y$ directions. By removing the right motor, we can see that by moving the tool head in the positive $x$ direction \textbf{or} in the positive $y$ direction, the left motor will rotate in the positive direction. We can draw similar conclusions for the right motor, for which we get the following equatons:
+First task is to derive the direct kinematics of the Core XY mechanism. One fact that slightly complicates this is the fact that rotating one motor will move the tool head in both $x$ and $y$ directions. By removing the right motor, we can see that by moving the tool head in the positive $x$ direction \textbf{or} in the positive $y$ direction, the left motor will rotate in the positive direction. We can draw similar conclusions for the right motor, for which we get the following equations:
 
 \begin{equation}
+\label{eq:belt_kinematics}
 \begin{aligned}
-\Delta A &= \Delta x + \Delta y \\
-\Delta B &= \Delta x - \Delta y \\
-\Delta x &= \frac{\Delta A + \Delta B}{2} \\
-\Delta y &= \frac{\Delta A - \Delta B}{2}
+\Delta L &= \Delta x + \Delta y \\
+\Delta R &= \Delta x - \Delta y \\
+\Delta x &= \frac{\Delta L + \Delta R}{2} \\
+\Delta y &= \frac{\Delta L - \Delta R}{2}
 \end{aligned}
-\tag{1}
 \end{equation}
 
-With $\Delta A$ and $\Delta B$ being the length of belt moved by the motors, and $\Delta x$ and $\Delta y$ being the change in position of the tool head.
+With $\Delta L$ and $\Delta R$ being the length of belt moved by the motors, and $\Delta x$ and $\Delta y$ being the change in position of the tool head.
 
 \begin{equation}
+\label{eq:belt_motor}
 \begin{aligned}
-\Delta A &= r_m \, \theta_L \\
-\Delta B &= r_m \, \theta_R
+\Delta L &= r_m \, \theta_L \\
+\Delta R &= r_m \, \theta_R
 \end{aligned}
-\tag{2}
 \end{equation}
 
 If we assume that in the beginning the motors are at
@@ -30,16 +30,17 @@ $\theta_L = \theta_R = 0$ and the cart is at $(0, 0)$, we get the following equa
 
 
 \begin{equation}
+\label{eq:kinematics}
 \begin{aligned}
 x(\theta_L, \theta_R) &= \frac{r_m \theta_L + r_m \theta_R}{2}
   = \frac{r_m}{2} \left( \theta_L + \theta_R \right) \\
 y(\theta_L, \theta_R) &= \frac{r_m \theta_L - r_m \theta_R}{2}
   = \frac{r_m}{2} \left( \theta_L - \theta_R \right)
 \end{aligned}
-\tag{3}
 \end{equation}
 
 \begin{equation}
+\label{eq:kinematics_vel}
 \begin{aligned}
 \dot{x}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L + \dot{\theta}_R \right) \\
 \dot{y}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L - \dot{\theta}_R \right)
@@ -47,62 +48,143 @@ y(\theta_L, \theta_R) &= \frac{r_m \theta_L - r_m \theta_R}{2}
 \end{equation}
 
 \subsection{Dynamics}
-In next part we model the dynamics of the 3D printer system by applying the Euler-Lagrange equation. Additionally, we will split the problem to a mechanical and an electrical one, with the angular velocity of the motor shafts connecting them. 
+In the next part we model the dynamics of the 3D printer system by applying the Euler-Lagrange equation. Additionally, we will split the problem to a mechanical and an electrical one, with the angular velocity of the motor shafts connecting them. 
 
 Because of that, we choose generalized coordinates:
-\[
-q = \begin{bmatrix} x \\ y \\ q_A \\ q_B \end{bmatrix}
+\begin{equation}
+\label{eq:gen_coords}
+q = \begin{bmatrix} x \\ y \\ q_L \\ q_R \end{bmatrix}
 \qquad
-\dot q = \begin{bmatrix} \dot x \\ \dot y \\ i_A \\ i_B \end{bmatrix}
-\]
+\dot q = \begin{bmatrix} \dot x \\ \dot y \\ i_L \\ i_R \end{bmatrix}
+\end{equation}
 We can also then split them among our two problems:
-\[
+\begin{equation}
+\label{eq:gen_coords_split}
 \dot q_m = \begin{bmatrix} \dot x \\ \dot y \end{bmatrix} \ \text{(mechanical part)},
 \qquad
-\dot q_e = \begin{bmatrix} i_A \\ i_B \end{bmatrix} \ \text{(electrical part)}
-\]
+\dot q_e = \begin{bmatrix} i_L \\ i_R \end{bmatrix} \ \text{(electrical part)}
+\end{equation}
 
 \subsubsection{Mechanical part}
 \subsubsection*{Kinetic energy}
-Fistly, we derive the kinetic energy terms. In the \textit{mechanical} part, the only mass is the tool head. With that we have:
-\[
-K_m = \tfrac{1}{2} m (\dot x^2 + \dot y^2)= \tfrac{1}{2}\,\dot q_m^\top M\, \dot q_m
-\quad with \quad
-M = \begin{bmatrix} m & 0 \\ 0 & m \end{bmatrix}
-\]
+Firstly, we derive the kinetic energy terms. In the \textit{mechanical} part, the only mass is the tool head. With that we have:
+\begin{equation}
+\label{eq:kinetic}
+K_m = \tfrac{1}{2} m (\dot x^2 + \dot y^2)
+\end{equation}
 
 As the whole system is planar, we can see that there is no potential energy terms as it will be constant.
 
-\subsubsection*{Dissipative}
-Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplcity. From (eq 4), we can get transformations (7) with trivial time derivatives.  
-\[
+\subsubsection*{Dissipative energy}
+Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
+\begin{equation}
+\label{eq:inverse_kinematics}
 \theta_L = \frac{ x +  y}{r_b},
 \qquad
 \theta_R = \frac{ x - y}{r_b}
-\]
+\end{equation}
 Then, for each side we get rotational dissipative energy:
-\begin{align*}
+\begin{equation*}
+\label{eq:dissipation_sides}
+\begin{aligned}
 D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_L^2\,\mu_r 
     = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
 D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_R^2\,\mu_r 
     = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
-\end{align*}
+\end{aligned}
+\end{equation*}
 
 Then simply combining them:
-\[
+\begin{equation*}
+\label{eq:dissipation_rot}
 \boxed{D_{\mathrm{rot}} = 4\,\frac{\mu_r}{r_b^2}\left[\dot x^2 + \dot y^2\right]}
-\]
+\end{equation*}
 
 Similarly, we get the linear dissipative energy:
-\[
-D_{\mathrm{lin}} = \tfrac{1}{2}\mu_{L,x}\,\dot x^2 + \tfrac{1}{2}\mu_{L,y}\,\dot y^2
-\]
+\begin{equation*}
+\label{eq:dissipation_lin}
+D_{\mathrm{lin}} = 4\tfrac{1}{2}\mu_{l,x}\,\dot x^2 + 4 \tfrac{1}{2}\mu_{l,y}\,\dot y^2
+\end{equation*}
 
 Then, combining the terms we get:
 
-\[
-D_m = \left[4\,\frac{\mu_r}{r_b^2} + \tfrac{1}{2}\mu_{L,x}\right]\dot x^2
-    + \left[4\,\frac{\mu_r}{r_b^2} + \tfrac{1}{2}\mu_{L,y}\right]\dot y^2
-\]
+\begin{equation}
+\label{eq:dissipation_mech}
+D_m = \left[4\,\frac{\mu_r}{r_b^2} + 2\mu_{l,x}\right]\dot x^2
+    + \left[4\,\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right]\dot y^2
+\end{equation}
 
-\subsubsection{Electrical part}
+\clearpage
+
+\subsubsection{Electromechanical part}
+Now we model the energies of the electrycal part of the system. Keep in mind that both motors are the same. Below we can see the equivalent circuit of a DC motor:
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\textwidth]{motor_sch.png}
+  \caption{Equivalent circuit of a DC motor.}
+  \label{fig:motor_circuit}
+\end{figure}
+
+\subsubsection*{Kinetic energy}
+The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly, like \ref{eq:inverse_kinematics}, using the motor shaft radius:
+
+\begin{equation*}
+\begin{aligned}
+K_L &= \tfrac{1}{2} i_L^2 L_m + \tfrac{1}{2} J_m \dot\theta_L^2 = \tfrac{1}{2} i_L^2 L_m + \tfrac{1}{2} J_m \frac{1}{r_m^2}\left(\dot x^2 + \dot y^2 + 2\dot x\dot y\right) \\
+K_R &= \tfrac{1}{2} i_R^2 L_m + \tfrac{1}{2} J_m \frac{1}{r_m^2}\left(\dot x^2 + \dot y^2 - 2\dot x\dot y\right) \\
+\end{aligned}
+\end{equation*}
+
+Combining them we get:
+
+\begin{equation}
+  \label{eq:kin_el}
+  K_{EL} = \tfrac{1}{2} L_m \left[i_R^2 + i_L^2\right] + J_m \frac{1}{r_m^2}\left(\dot x^2 + \dot y^2\right)
+\end{equation}
+
+As there are no capacitors in the system, there is no potential energy change as in the mechanical part.
+
+\subsubsection*{Dissipative energy}
+Only dissipative term in the electrical part of the system is the resistor:
+
+\begin{equation}
+  \begin{gathered}
+    D_{EL,L} = \tfrac{1}{2} i_L^2 R_m, \qquad 
+    D_{EL,R} = \tfrac{1}{2} i_R^2 R_m \\
+    D_{EL} = \tfrac{1}{2} R_m \left(i_L^2 + i_R^2\right)
+  \end{gathered}
+\end{equation}
+
+\subsubsection*{Matrix equations}
+Finally, we realize that the system is linear, and write the the matrix expressions:
+
+\begin{equation}
+  \begin{aligned}
+    K = \tfrac{1}{2}\,\dot q^\top \mathbf{M}\,\dot q,
+\qquad
+D = \tfrac{1}{2}\,\dot q^\top \mathbf{B}\,\dot q
+  \end{aligned}
+\end{equation}
+
+With corresponding matrices:
+
+\begin{equation}
+\begin{aligned}
+\mathbf{M} &= \begin{bmatrix}
+m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
+0 & m + J_m \dfrac{2}{r_m^2} & 0 & 0 \\
+0 & 0 & L_m & 0 \\
+0 & 0 & 0 & L_m
+\end{bmatrix} \\
+\mathbf{B} &= \begin{bmatrix}
+8\dfrac{\mu_r}{r_b^2} + 4\mu_{L,x} & 0 & 0 & 0 \\
+0 & 8\dfrac{\mu_r}{r_b^2} + 4\mu_{L,y} & 0 & 0 \\
+0 & 0 & R_m & 0 \\
+0 & 0 & 0 & R_m
+\end{bmatrix}
+\end{aligned}
+\end{equation}
+
+
+\subsubsection{Generalized force}
