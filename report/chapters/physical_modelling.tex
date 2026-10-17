@@ -62,45 +62,47 @@ We can also then split them among our two problems:
 \dot q_e = \begin{bmatrix} i_A \\ i_B \end{bmatrix} \ \text{(electrical part)}
 \]
 
-\subsubsection*{Kinetic energy -- mechanical part}
+\subsubsection{Mechanical part}
+\subsubsection*{Kinetic energy}
+Fistly, we derive the kinetic energy terms. In the \textit{mechanical} part, the only mass is the tool head. With that we have:
 \[
-\boxed{K_m = \tfrac{1}{2}\,\dot q_m^\top M\, \dot q_m}
-\quad\Rightarrow\quad
+K_m = \tfrac{1}{2} m (\dot x^2 + \dot y^2)= \tfrac{1}{2}\,\dot q_m^\top M\, \dot q_m
+\quad with \quad
 M = \begin{bmatrix} m & 0 \\ 0 & m \end{bmatrix}
 \]
-$\Rightarrow$ No potential.
+
+As the whole system is planar, we can see that there is no potential energy terms as it will be constant.
 
 \subsubsection*{Dissipative}
-
-4 rotational bearings for each roller. Define $r_b$ as the bearing radius:
+Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplcity. From (eq 4), we can get transformations (7) with trivial time derivatives.  
 \[
-\theta_L = \frac{\Delta x + \Delta y}{r_b},
+\theta_L = \frac{ x +  y}{r_b},
 \qquad
-\theta_R = \frac{\Delta x - \Delta y}{r_b}
+\theta_R = \frac{ x - y}{r_b}
 \]
+Then, for each side we get rotational dissipative energy:
 \begin{align*}
-D_L &= \tfrac{1}{2}\,\dot\theta_L^\top D\,\dot\theta_L
-     = \tfrac{1}{2}\cdot 4\cdot \dot\theta_L^2\,\mu_r
-     = 2\,\dot\theta_L^2\,\mu_r \\
-    &= 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
-D_R &= 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
+D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_L^2\,\mu_r 
+    = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
+D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_R^2\,\mu_r 
+    = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
 \end{align*}
+
+Then simply combining them:
 \[
 \boxed{D_{\mathrm{rot}} = 4\,\frac{\mu_r}{r_b^2}\left[\dot x^2 + \dot y^2\right]}
 \]
+
+Similarly, we get the linear dissipative energy:
 \[
-D_{\mathrm{lin}} = \tfrac{1}{2}\,\dot q_m^\top B\,\dot q_m
-= \tfrac{1}{2}\mu_{L,x}\,\dot x^2 + \tfrac{1}{2}\mu_{L,y}\,\dot y^2
+D_{\mathrm{lin}} = \tfrac{1}{2}\mu_{L,x}\,\dot x^2 + \tfrac{1}{2}\mu_{L,y}\,\dot y^2
 \]
+
+Then, combining the terms we get:
+
 \[
 D_m = \left[4\,\frac{\mu_r}{r_b^2} + \tfrac{1}{2}\mu_{L,x}\right]\dot x^2
     + \left[4\,\frac{\mu_r}{r_b^2} + \tfrac{1}{2}\mu_{L,y}\right]\dot y^2
 \]
-\[
-B = \begin{bmatrix}
-8\,\dfrac{\mu_r}{r_b^2} + \mu_{L,x} & 0 \\[2ex]
-0 & 8\,\dfrac{\mu_r}{r_b^2} + \mu_{L,y}
-\end{bmatrix},
-\qquad
-\boxed{D_m = \tfrac{1}{2}\,\dot q_m^\top B\,\dot q_m}
-\]
+
+\subsubsection{Electrical part}
