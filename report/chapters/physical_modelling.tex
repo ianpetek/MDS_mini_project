@@ -348,12 +348,23 @@ By substituting our new decoupled currents we get:
 
 Then by adding and subtracting the two equations to cancel terms we get:
 
-\begin{equation*}
+\begin{equation}
+\label{eq:decoupled_currents}
 \begin{aligned}
 \frac{di_x}{dt} &= -\frac{2K_m}{r_m L_m}\dot x - \frac{R_m}{L_m} i_x + \frac{1}{L_m} u_{m,x} \\
 \frac{di_y}{dt} &= -\frac{2K_m}{r_m L_m}\dot y - \frac{R_m}{L_m} i_y + \frac{1}{L_m} u_{m,y}
 \end{aligned}
-\end{equation*}
+\end{equation}
+
+And by substituting \eqref{eq:decoupling_subs} into the first two equations of \eqref{eq:state_equations}:
+
+\begin{equation}
+\label{eq:decoupled_motion}
+\begin{aligned}
+\ddot x &= -\frac{b_x}{m_{eq}}\dot x + \frac{K_m}{m_{eq} r_m} i_x \\
+\ddot y &= -\frac{b_y}{m_{eq}}\dot y + \frac{K_m}{m_{eq} r_m} i_y
+\end{aligned}
+\end{equation}
 
 And finally:
 
@@ -386,3 +397,106 @@ And finally:
 \mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut \dfrac{1}{L_m} & 0 \\ \mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut 0 & \dfrac{1}{L_m}
 \end{bmatrix}
 \end{equation*}
+
+\subsection{Drawing shapes}
+\label{sec:drawing_shapes}
+
+Rearranging the decoupled equations of motion \eqref{eq:decoupled_motion}, we can express the currents needed to follow a prescribed motion of the tool head:
+
+\begin{equation}
+\label{eq:inverse_currents}
+\boxed{
+\begin{aligned}
+i_x &= \frac{m_{eq} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x \\
+i_y &= \frac{m_{eq} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y
+\end{aligned}}
+\end{equation}
+
+The motor equations for each motor are:
+
+\begin{equation*}
+\begin{aligned}
+u_{m,L} &= L_m \frac{di_L}{dt} + R_m i_L + K_m \dot\theta_L
+         = L_m \frac{di_L}{dt} + R_m i_L + \frac{K_m}{r_m}\left(\dot x + \dot y\right) \\
+u_{m,R} &= L_m \frac{di_R}{dt} + R_m i_R + \frac{K_m}{r_m}\left(\dot x - \dot y\right)
+\end{aligned}
+\end{equation*}
+
+Adding them, and using \eqref{eq:decoupling_subs}:
+
+\begin{equation*}
+u_{m,x} = u_{m,L} + u_{m,R}
+        = L_m\left[\frac{di_L}{dt} + \frac{di_R}{dt}\right] + R_m\left[i_L + i_R\right] + \frac{2K_m}{r_m}\,\dot x
+\end{equation*}
+
+and similarly by subtracting them, we get the decoupled input voltages, consistent with \eqref{eq:decoupled_currents}:
+
+\begin{equation}
+\label{eq:inverse_voltages}
+\boxed{
+\begin{aligned}
+u_{m,x} &= L_m \frac{di_x}{dt} + R_m i_x + \frac{2K_m}{r_m}\,\dot x \\
+u_{m,y} &= L_m \frac{di_y}{dt} + R_m i_y + \frac{2K_m}{r_m}\,\dot y
+\end{aligned}}
+\end{equation}
+
+The original motor voltages then follow from \eqref{eq:decoupling_subs}:
+
+\begin{equation}
+\label{eq:inverse_motor_voltages}
+u_{m,L} = \tfrac{1}{2}\left(u_{m,x} + u_{m,y}\right),
+\qquad
+u_{m,R} = \tfrac{1}{2}\left(u_{m,x} - u_{m,y}\right)
+\end{equation}
+
+Since \eqref{eq:inverse_voltages} contains $\frac{di_x}{dt}$, and \eqref{eq:inverse_currents} contains $\ddot x$, the voltages depend on the third derivative of the position. Therefore, for any $C^3$ functions $x(t)$ and $y(t)$ describing the position of the tool head, we can derive an open-loop analytical solution for the input voltages, even if those voltages aren't realistic.
+
+\subsubsection*{Ellipse}
+An ellipse with centre $(h, k)$ and semi-axes $a$ and $b$ has the parametric form:
+
+\begin{equation}
+\label{eq:ellipse}
+x(t) = h + a\cos t,
+\qquad
+y(t) = k + b\sin t
+\end{equation}
+
+We also need the derivatives up to the third order:
+
+\begin{equation*}
+\begin{aligned}
+\dot x &= -a\sin t, & \ddot x &= -a\cos t, & \dddot x &= a\sin t \\
+\dot y &= b\cos t,  & \ddot y &= -b\sin t, & \dddot y &= -b\cos t
+\end{aligned}
+\end{equation*}
+
+Substituting into \eqref{eq:inverse_currents}:
+
+\begin{equation*}
+\begin{aligned}
+i_x(t) &= -\frac{m_{eq} r_m}{K_m}\,a\cos t - \frac{b_x r_m}{K_m}\,a\sin t
+        = -\frac{r_m}{K_m}\,a\left[m_{eq}\cos t + b_x\sin t\right] \\
+i_y(t) &= \frac{r_m}{K_m}\,b\left[b_y\cos t - m_{eq}\sin t\right]
+\end{aligned}
+\end{equation*}
+
+And into \eqref{eq:inverse_voltages}:
+
+\begin{equation*}
+\begin{aligned}
+u_{m,x}(t) &= L_m\frac{r_m}{K_m}\,a\left[m_{eq}\sin t - b_x\cos t\right]
+            - R_m\frac{r_m}{K_m}\,a\left[m_{eq}\cos t + b_x\sin t\right]
+            - \frac{2K_m}{r_m}\,a\sin t \\
+u_{m,y}(t) &= -L_m\frac{r_m}{K_m}\,b\left[m_{eq}\cos t + b_y\sin t\right]
+            + R_m\frac{r_m}{K_m}\,b\left[b_y\cos t - m_{eq}\sin t\right]
+            + \frac{2K_m}{r_m}\,b\cos t
+\end{aligned}
+\end{equation*}
+
+With
+\begin{equation*}
+u_{m,L}(t) = \tfrac{1}{2}\left(u_{m,x}(t) + u_{m,y}(t)\right),
+\qquad
+u_{m,R}(t) = \tfrac{1}{2}\left(u_{m,x}(t) - u_{m,y}(t)\right)
+\end{equation*}
+we obtain the analytical open-loop solution for drawing the ellipse.
