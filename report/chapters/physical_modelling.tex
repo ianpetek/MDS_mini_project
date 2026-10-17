@@ -163,7 +163,7 @@ Finally, we realize that the system is linear, and write the matrix expressions:
   \begin{aligned}
     K = \tfrac{1}{2}\,\dot q^\top \mathbf{M}\,\dot q,
 \qquad
-D = \tfrac{1}{2}\,\dot q^\top \mathbf{B}\,\dot q
+D = \tfrac{1}{2}\,\dot q^\top \mathbf{N}\,\dot q
   \end{aligned}
 \end{equation}
 
@@ -177,7 +177,7 @@ m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 0 & 0 & L_m & 0 \\
 0 & 0 & 0 & L_m
 \end{bmatrix} \\
-\mathbf{B} &= \begin{bmatrix}
+\mathbf{N} &= \begin{bmatrix}
 8\dfrac{\mu_r}{r_b^2} + 4\mu_{l,x} & 0 & 0 & 0 \\
 0 & 8\dfrac{\mu_r}{r_b^2} + 4\mu_{l,y} & 0 & 0 \\
 0 & 0 & R_m & 0 \\
@@ -217,3 +217,172 @@ Q_{q_L} = u_{m,L} - \frac{K_m}{r_m}\left(\dot x + \dot y\right),
 \qquad
 Q_{q_R} = u_{m,R} - \frac{K_m}{r_m}\left(\dot x - \dot y\right)
 \end{equation}
+
+\subsubsection*{Lagrange equations}
+Using the fact this is a linear system and there are no potential energies we get:
+
+
+\begin{equation*}
+\mathcal{L} = K - V = \tfrac{1}{2}\,\dot q^\top \mathbf{M}\,\dot q - V,
+\qquad V = 0
+\quad\Rightarrow\quad
+\mathcal{L} = \tfrac{1}{2}\,\dot q^\top \mathbf{M}\,\dot q
+\end{equation*}
+
+\begin{equation*}
+\begin{aligned}
+\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} &= \frac{d}{dt}\left(\mathbf{M}\dot q\right) = \mathbf{M}\ddot q \\
+\frac{\partial \mathcal{L}}{\partial q} &= 0 \\
+\frac{\partial D}{\partial \dot q} &= \mathbf{N}\dot q
+\end{aligned}
+\end{equation*}
+
+And finally solving the Euler-Lagrange equation:
+
+\begin{equation*}
+\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} - \frac{\partial \mathcal{L}}{\partial q} = -\frac{\partial D}{\partial \dot q} + \mathbf{Q},
+\qquad
+\mathbf{Q} = \begin{bmatrix} Q_x \\ Q_y \\ Q_{q_L} \\ Q_{q_R} \end{bmatrix}
+\end{equation*}
+
+\begin{equation}
+\label{eq:lagrange_matrix}
+\mathbf{M}\ddot q + \mathbf{N}\dot q = \mathbf{Q}
+\end{equation}
+
+Expanding back out of matrix form we get:
+
+
+\begin{equation*}
+\begin{aligned}
+\left(m + J_m\frac{2}{r_m^2}\right)\ddot x
+  + \left(8\frac{\mu_r}{r_b^2} + 4\mu_{l,x}\right)\dot x
+  - \frac{K_m}{r_m} i_L - \frac{K_m}{r_m} i_R &= 0 \\
+\left(m + J_m\frac{2}{r_m^2}\right)\ddot y
+  + \left(8\frac{\mu_r}{r_b^2} + 4\mu_{l,y}\right)\dot y
+  - \frac{K_m}{r_m} i_L + \frac{K_m}{r_m} i_R &= 0 \\
+L_m \frac{di_L}{dt} + R_m i_L + \frac{K_m}{r_m}\dot x + \frac{K_m}{r_m}\dot y - u_{m,L} &= 0 \\
+L_m \frac{di_R}{dt} + R_m i_R + \frac{K_m}{r_m}\dot x - \frac{K_m}{r_m}\dot y - u_{m,R} &= 0
+\end{aligned}
+\end{equation*}
+
+Or with substitutions, we get final form of the four differential equations:
+
+\begin{equation*}
+m_{eq} = m + \frac{2J_m}{r_m^2},
+\qquad
+b_x = 8\frac{\mu_r}{r_b^2} + 4\mu_{l,x},
+\qquad
+b_y = 8\frac{\mu_r}{r_b^2} + 4\mu_{l,y}
+\end{equation*}
+
+\begin{equation}
+\label{eq:state_equations}
+\boxed{
+\begin{aligned}
+\ddot x &= -\frac{b_x}{m_{eq}}\dot x + \frac{K_m}{m_{eq} r_m}\left(i_L + i_R\right) \\
+\ddot y &= -\frac{b_y}{m_{eq}}\dot y + \frac{K_m}{m_{eq} r_m}\left(i_L - i_R\right) \\
+\frac{di_L}{dt} &= -\frac{K_m}{r_m L_m}\left(\dot x + \dot y\right) - \frac{R_m}{L_m} i_L + \frac{u_{m,L}}{L_m} \\
+\frac{di_R}{dt} &= -\frac{K_m}{r_m L_m}\left(\dot x - \dot y\right) - \frac{R_m}{L_m} i_R + \frac{u_{m,R}}{L_m}
+\end{aligned}}
+\end{equation}
+
+Or in \textbf{state-space} form:
+
+\begin{equation*}
+\mathbf{x} = \begin{bmatrix} x \\ y \\ \dot x \\ \dot y \\ i_L \\ i_R \end{bmatrix},
+\qquad
+\dot{\mathbf{x}} = \begin{bmatrix} \dot x \\ \dot y \\ \ddot x \\ \ddot y \\ \dfrac{di_L}{dt} \\[1ex] \dfrac{di_R}{dt} \end{bmatrix},
+\qquad
+\mathbf{u} = \begin{bmatrix} u_{m,L} \\ u_{m,R} \end{bmatrix}
+\end{equation*}
+
+\begin{equation}
+\label{eq:state_space}
+\dot{\mathbf{x}} = \mathbf{A}\,\mathbf{x} + \mathbf{B}\,\mathbf{u}
+\end{equation}
+
+\begin{equation*}
+\mathbf{A} =
+\begin{bmatrix}
+\mstrut 0 & 0 & 1 & 0 & 0 & 0 \\
+\mstrut 0 & 0 & 0 & 1 & 0 & 0 \\
+\mstrut 0 & 0 & -\dfrac{b_x}{m_{eq}} & 0 & \dfrac{K_m}{m_{eq} r_m} & \dfrac{K_m}{m_{eq} r_m} \\
+\mstrut 0 & 0 & 0 & -\dfrac{b_y}{m_{eq}} & \dfrac{K_m}{m_{eq} r_m} & -\dfrac{K_m}{m_{eq} r_m} \\
+\mstrut 0 & 0 & -\dfrac{K_m}{r_m L_m} & -\dfrac{K_m}{r_m L_m} & -\dfrac{R_m}{L_m} & 0 \\
+\mstrut 0 & 0 & -\dfrac{K_m}{r_m L_m} & \dfrac{K_m}{r_m L_m} & 0 & -\dfrac{R_m}{L_m}
+\end{bmatrix},
+\qquad
+\mathbf{B} =
+\begin{bmatrix}
+\mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut \dfrac{1}{L_m} & 0 \\ \mstrut 0 & \dfrac{1}{L_m}
+\end{bmatrix}
+\end{equation*}
+
+\subsubsection{Decoupling the x and y dynamics}
+To decouple the system, we introduce a set of useful substitutions:
+
+\begin{equation}
+\label{eq:decoupling_subs}
+\boxed{
+\begin{aligned}
+i_x &= i_L + i_R, & u_{m,x} &= u_{m,L} + u_{m,R} \\
+i_y &= i_L - i_R, & u_{m,y} &= u_{m,L} - u_{m,R} \\
+i_L &= \frac{i_x + i_y}{2}, & u_{m,L} &= \frac{u_{m,x} + u_{m,y}}{2} \\
+i_R &= \frac{i_x - i_y}{2}, & u_{m,R} &= \frac{u_{m,x} - u_{m,y}}{2}
+\end{aligned}}
+\end{equation}
+
+By substituting our new decoupled currents we get:
+
+\begin{equation*}
+\begin{aligned}
+\frac{di_L}{dt} &= \tfrac{1}{2}\frac{di_x}{dt} + \tfrac{1}{2}\frac{di_y}{dt}
+  = -\frac{K_m}{r_m L_m}\dot x - \frac{K_m}{r_m L_m}\dot y
+    - \frac{R_m}{2L_m} i_x - \frac{R_m}{2L_m} i_y + \frac{1}{2L_m}\left(u_{m,x} + u_{m,y}\right) \\
+\frac{di_R}{dt} &= \tfrac{1}{2}\frac{di_x}{dt} - \tfrac{1}{2}\frac{di_y}{dt}
+  = -\frac{K_m}{r_m L_m}\dot x + \frac{K_m}{r_m L_m}\dot y
+    - \frac{R_m}{2L_m} i_x + \frac{R_m}{2L_m} i_y + \frac{1}{2L_m}\left(u_{m,x} - u_{m,y}\right)
+\end{aligned}
+\end{equation*}
+
+Then by adding and subtracting the two equations to cancel terms we get:
+
+\begin{equation*}
+\begin{aligned}
+\frac{di_x}{dt} &= -\frac{2K_m}{r_m L_m}\dot x - \frac{R_m}{L_m} i_x + \frac{1}{L_m} u_{m,x} \\
+\frac{di_y}{dt} &= -\frac{2K_m}{r_m L_m}\dot y - \frac{R_m}{L_m} i_y + \frac{1}{L_m} u_{m,y}
+\end{aligned}
+\end{equation*}
+
+And finally:
+
+\begin{equation*}
+\tilde{\mathbf{x}} = \begin{bmatrix} x \\ \dot x \\ i_x \\ y \\ \dot y \\ i_y \end{bmatrix},
+\qquad
+\dot{\tilde{\mathbf{x}}} = \begin{bmatrix} \dot x \\ \ddot x \\ \dfrac{di_x}{dt} \\[1ex] \dot y \\ \ddot y \\ \dfrac{di_y}{dt} \end{bmatrix},
+\qquad
+\tilde{\mathbf{u}} = \begin{bmatrix} u_{m,x} \\ u_{m,y} \end{bmatrix}
+\end{equation*}
+
+\begin{equation}
+\label{eq:state_space_decoupled}
+\dot{\tilde{\mathbf{x}}} = \tilde{\mathbf{A}}\,\tilde{\mathbf{x}} + \tilde{\mathbf{B}}\,\tilde{\mathbf{u}}
+\end{equation}
+
+\begin{equation*}
+\tilde{\mathbf{A}} =
+\left[\begin{array}{ccc|ccc}
+\mstrut 0 & 1 & 0 & 0 & 0 & 0 \\
+\mstrut 0 & -\dfrac{b_x}{m_{eq}} & \dfrac{K_m}{m_{eq} r_m} & 0 & 0 & 0 \\
+\mstrut 0 & -\dfrac{2K_m}{r_m L_m} & -\dfrac{R_m}{L_m} & 0 & 0 & 0 \\ \hline
+\mstrut 0 & 0 & 0 & 0 & 1 & 0 \\
+\mstrut 0 & 0 & 0 & 0 & -\dfrac{b_y}{m_{eq}} & \dfrac{K_m}{m_{eq} r_m} \\
+\mstrut 0 & 0 & 0 & 0 & -\dfrac{2K_m}{r_m L_m} & -\dfrac{R_m}{L_m}
+\end{array}\right],
+\qquad
+\tilde{\mathbf{B}} =
+\begin{bmatrix}
+\mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut \dfrac{1}{L_m} & 0 \\ \mstrut 0 & 0 \\ \mstrut 0 & 0 \\ \mstrut 0 & \dfrac{1}{L_m}
+\end{bmatrix}
+\end{equation*}
