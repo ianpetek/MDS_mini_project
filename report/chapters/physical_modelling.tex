@@ -70,7 +70,7 @@ We can also then split them among our two problems:
 Firstly, we derive the kinetic energy terms. In the \textit{mechanical} part, the only mass is the tool head. With that we have:
 \begin{equation}
 \label{eq:kinetic}
-K_m = \tfrac{1}{2} m (\dot x^2 + \dot y^2)
+K_{mech} = \tfrac{1}{2} m (\dot x^2 + \dot y^2)
 \end{equation}
 
 As the whole system is planar, we can see that there is no potential energy terms as it will be constant.
@@ -79,17 +79,17 @@ As the whole system is planar, we can see that there is no potential energy term
 Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
 \begin{equation}
 \label{eq:inverse_kinematics}
-\theta_L = \frac{ x +  y}{r_b},
+\theta_{b,L} = \frac{ x +  y}{r_b},
 \qquad
-\theta_R = \frac{ x - y}{r_b}
+\theta_{b,R} = \frac{ x - y}{r_b}
 \end{equation}
 Then, for each side we get rotational dissipative energy:
 \begin{equation*}
 \label{eq:dissipation_sides}
 \begin{aligned}
-D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_L^2\,\mu_r 
+D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L}^2\,\mu_r 
     = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
-D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_R^2\,\mu_r 
+D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R}^2\,\mu_r 
     = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
 \end{aligned}
 \end{equation*}
@@ -117,7 +117,7 @@ D_m = \left[4\,\frac{\mu_r}{r_b^2} + 2\mu_{l,x}\right]\dot x^2
 \clearpage
 
 \subsubsection{Electromechanical part}
-Now we model the energies of the electrycal part of the system. Keep in mind that both motors are the same. Below we can see the equivalent circuit of a DC motor:
+Now we model the energies of the electrical part of the system. Keep in mind that both motors are the same. Below we can see the equivalent circuit of a DC motor:
 
 \begin{figure}[htbp]
   \centering
@@ -127,7 +127,7 @@ Now we model the energies of the electrycal part of the system. Keep in mind tha
 \end{figure}
 
 \subsubsection*{Kinetic energy}
-The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly, like \ref{eq:inverse_kinematics}, using the motor shaft radius:
+The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly, like \eqref{eq:inverse_kinematics}, using the motor shaft radius:
 
 \begin{equation*}
 \begin{aligned}
@@ -157,7 +157,7 @@ Only dissipative term in the electrical part of the system is the resistor:
 \end{equation}
 
 \subsubsection*{Matrix equations}
-Finally, we realize that the system is linear, and write the the matrix expressions:
+Finally, we realize that the system is linear, and write the matrix expressions:
 
 \begin{equation}
   \begin{aligned}
@@ -178,8 +178,8 @@ m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 0 & 0 & 0 & L_m
 \end{bmatrix} \\
 \mathbf{B} &= \begin{bmatrix}
-8\dfrac{\mu_r}{r_b^2} + 4\mu_{L,x} & 0 & 0 & 0 \\
-0 & 8\dfrac{\mu_r}{r_b^2} + 4\mu_{L,y} & 0 & 0 \\
+8\dfrac{\mu_r}{r_b^2} + 4\mu_{l,x} & 0 & 0 & 0 \\
+0 & 8\dfrac{\mu_r}{r_b^2} + 4\mu_{l,y} & 0 & 0 \\
 0 & 0 & R_m & 0 \\
 0 & 0 & 0 & R_m
 \end{bmatrix}
@@ -188,3 +188,32 @@ m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 
 
 \subsubsection{Generalized force}
+\subsubsection*{Mechanical coordinates}
+The non-conservative forces in the mechanical part are given by the motor torques $\tau_L$ and $\tau_R$. The virtual work they perform is:
+\begin{equation*}
+\Delta W = \tau_L\,\Delta\theta_L + \tau_R\,\Delta\theta_R
+\end{equation*}
+With the familiar transformation, analogous to \eqref{eq:inverse_kinematics} but using the motor radius $r_m$, we get:
+\begin{equation*}
+\Delta W = \frac{\tau_L + \tau_R}{r_m}\,\Delta x + \frac{\tau_L - \tau_R}{r_m}\,\Delta y
+\end{equation*}
+Applying the motor law $\tau = K_m i$, the generalized forces for $x$ and $y$ are:
+\begin{equation}
+\label{eq:gen_force_mech}
+Q_x = \frac{K_m}{r_m}\left(i_L + i_R\right),
+\qquad
+Q_y = \frac{K_m}{r_m}\left(i_L - i_R\right)
+\end{equation}
+
+\subsubsection*{Electrical coordinates}
+The non-conservative forces in the electrical part are the input voltages and the back-EMF of the motors:
+\begin{equation*}
+\Delta W = \left(u_{m,L} - K_m\dot\theta_L\right)\Delta q_L + \left(u_{m,R} - K_m\dot\theta_R\right)\Delta q_R
+\end{equation*}
+Using the same transformation, we get the generalized forces for $q_L$ and $q_R$:
+\begin{equation}
+\label{eq:gen_force_el}
+Q_{q_L} = u_{m,L} - \frac{K_m}{r_m}\left(\dot x + \dot y\right),
+\qquad
+Q_{q_R} = u_{m,R} - \frac{K_m}{r_m}\left(\dot x - \dot y\right)
+\end{equation}
