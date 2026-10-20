@@ -2,7 +2,7 @@
 \label{sec:physical_modelling}
 
 \subsection{Kinematics}
-First task is to derive the direct kinematics of the Core XY mechanism. One fact that slightly complicates this is the fact that rotating one motor will move the tool head in both $x$ and $y$ directions. By removing the right motor, we can see that by moving the tool head in the positive $x$ direction \textbf{or} in the positive $y$ direction, the left motor will rotate in the positive direction. We can draw similar conclusions for the right motor, for which we get the following equations:
+The first task is to derive the direct kinematics of the Core XY mechanism. This is slightly complicated by the fact that rotating one motor will move the tool head in both $x$ and $y$ directions. By removing the right motor, we can see that by moving the tool head in the positive $x$ direction \textbf{or} in the positive $y$ direction, the left motor will rotate in the positive direction. We can draw similar conclusions for the right motor, for which we get the following equations:
 
 \begin{equation}
 \label{eq:belt_kinematics}
@@ -25,7 +25,7 @@ With $\Delta L$ and $\Delta R$ being the length of belt moved by the motors, and
 \end{equation}
 
 If we assume that in the beginning the motors are at
-$\theta_L = \theta_R = 0$ and the cart is at $(0, 0)$, we get the following equations:
+$\theta_L = \theta_R = 0$ and the tool head is at $(0, 0)$, we get the following equations:
 
 
 
@@ -48,9 +48,9 @@ y(\theta_L, \theta_R) &= \frac{r_m \theta_L - r_m \theta_R}{2}
 \end{equation}
 
 \subsection{Dynamics}
-In the next part we model the dynamics of the 3D printer system by applying the Euler-Lagrange equation. Additionally, we will split the problem to a mechanical and an electrical one, with the angular velocity of the motor shafts connecting them. 
+In the next part we model the dynamics of the 3D printer system by applying the Euler--Lagrange equation. Additionally, we will split the problem into a mechanical and an electrical one, with the angular velocity of the motor shafts connecting them. 
 
-Because of that, we choose generalized coordinates:
+Because of that, we choose generalised coordinates:
 \begin{equation}
 \label{eq:gen_coords}
 q = \begin{bmatrix} x \\ y \\ q_L \\ q_R \end{bmatrix}
@@ -65,20 +65,20 @@ We can also then split them among our two problems:
 \dot q_e = \begin{bmatrix} i_L \\ i_R \end{bmatrix} \ \text{(electrical part)}
 \end{equation}
 
-\subsubsection{Mechanical part}
-\subsubsection*{Kinetic energy}
+\subsubsection{Mechanical Part}
+\subsubsection*{Kinetic Energy}
 Firstly, we derive the kinetic energy terms. In the \textit{mechanical} part, the only mass is the tool head. With that we have:
 \begin{equation}
 \label{eq:kinetic}
-K_{mech} = \tfrac{1}{2} m (\dot x^2 + \dot y^2)
+K_{\mathrm{mech}} = \tfrac{1}{2} m (\dot x^2 + \dot y^2)
 \end{equation}
 
-As the whole system is planar, we can see that there is no potential energy terms as it will be constant.
+As the whole system is planar, we can see that there are no potential energy terms as it will be constant.
 
-\subsubsection*{Dissipative energy}
+\subsubsection*{Dissipative Energy}
 Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system, two along each axis. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
 
-\todo{This needs to be corrected, not all bearing roll at all times, they depend on what motor rotates}
+\todo{This needs to be corrected, not all bearings roll at all times, they depend on what motor rotates}
 \begin{equation}
 \label{eq:inverse_kinematics}
 \theta_{b,L} = \frac{ x +  y}{r_b},
@@ -87,7 +87,6 @@ Secondly, we find the dissipative energy terms. Each motor has 4 rotational bear
 \end{equation}
 Then, for each side we get rotational dissipative energy:
 \begin{equation*}
-\label{eq:dissipation_sides}
 \begin{aligned}
 D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L}^2\,\mu_r 
     = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
@@ -98,13 +97,11 @@ D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R}^2\,\mu_r
 
 Then simply combining them:
 \begin{equation*}
-\label{eq:dissipation_rot}
 \boxed{D_{\mathrm{rot}} = 4\,\frac{\mu_r}{r_b^2}\left[\dot x^2 + \dot y^2\right]}
 \end{equation*}
 
 Similarly, we get the linear dissipative energy:
 \begin{equation*}
-\label{eq:dissipation_lin}
 D_{\mathrm{lin}} = 2\cdot\tfrac{1}{2}\mu_{l,x}\,\dot x^2 + 2\cdot\tfrac{1}{2}\mu_{l,y}\,\dot y^2 = \mu_{l,x}\,\dot x^2 + \mu_{l,y}\,\dot y^2
 \end{equation*}
 
@@ -112,13 +109,13 @@ Then, combining the terms we get:
 
 \begin{equation}
 \label{eq:dissipation_mech}
-D_m = \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,x}\right]\dot x^2
+D_{\mathrm{mech}} = \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,x}\right]\dot x^2
     + \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
 \end{equation}
 
 \clearpage
 
-\subsubsection{Electromechanical part}
+\subsubsection{Electrical Part}
 Now we model the energies of the electrical part of the system. Keep in mind that both motors are the same. Below we can see the equivalent circuit of a DC motor:
 
 \begin{figure}[htbp]
@@ -128,8 +125,8 @@ Now we model the energies of the electrical part of the system. Keep in mind tha
   \label{fig:motor_circuit}
 \end{figure}
 
-\subsubsection*{Kinetic energy}
-The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly, like \eqref{eq:inverse_kinematics}, using the motor shaft radius:
+\subsubsection*{Kinetic Energy}
+The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly to \eqref{eq:inverse_kinematics}, using the motor shaft radius:
 
 \begin{equation*}
 \begin{aligned}
@@ -142,24 +139,24 @@ Combining them we get:
 
 \begin{equation}
   \label{eq:kin_el}
-  K_{EL} = \tfrac{1}{2} L_m \left[i_R^2 + i_L^2\right] + J_m \frac{1}{r_m^2}\left(\dot x^2 + \dot y^2\right)
+  K_{\mathrm{el}} = \tfrac{1}{2} L_m \left[i_R^2 + i_L^2\right] + J_m \frac{1}{r_m^2}\left(\dot x^2 + \dot y^2\right)
 \end{equation}
 
 As there are no capacitors in the system, there is no potential energy change as in the mechanical part.
 
-\subsubsection*{Dissipative energy}
-Only dissipative term in the electrical part of the system is the resistor:
+\subsubsection*{Dissipative Energy}
+The only dissipative term in the electrical part of the system is the resistor:
 
 \begin{equation}
   \begin{gathered}
-    D_{EL,L} = \tfrac{1}{2} i_L^2 R_m, \qquad 
-    D_{EL,R} = \tfrac{1}{2} i_R^2 R_m \\
-    D_{EL} = \tfrac{1}{2} R_m \left(i_L^2 + i_R^2\right)
+    D_{\mathrm{el},L} = \tfrac{1}{2} i_L^2 R_m, \qquad 
+    D_{\mathrm{el},R} = \tfrac{1}{2} i_R^2 R_m \\
+    D_{\mathrm{el}} = \tfrac{1}{2} R_m \left(i_L^2 + i_R^2\right)
   \end{gathered}
 \end{equation}
 
-\subsubsection*{Matrix equations}
-Finally, we realize that the system is linear, and write the matrix expressions:
+\subsubsection*{Matrix Equations}
+Finally, we realise that the system is linear, and write the matrix expressions:
 
 \begin{equation}
   \begin{aligned}
@@ -189,8 +186,8 @@ m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 \end{equation}
 
 
-\subsubsection{Generalized force}
-\subsubsection*{Mechanical coordinates}
+\subsubsection{Generalised Force}
+\subsubsection*{Mechanical Coordinates}
 The non-conservative forces in the mechanical part are given by the motor torques $\tau_L$ and $\tau_R$. The virtual work they perform is:
 \begin{equation*}
 \Delta W = \tau_L\,\Delta\theta_L + \tau_R\,\Delta\theta_R
@@ -199,7 +196,7 @@ With the familiar transformation, analogous to \eqref{eq:inverse_kinematics} but
 \begin{equation*}
 \Delta W = \frac{\tau_L + \tau_R}{r_m}\,\Delta x + \frac{\tau_L - \tau_R}{r_m}\,\Delta y
 \end{equation*}
-Applying the motor law $\tau = K_m i$, the generalized forces for $x$ and $y$ are:
+Applying the motor law $\tau = K_m i$, the generalised forces for $x$ and $y$ are:
 \begin{equation}
 \label{eq:gen_force_mech}
 Q_x = \frac{K_m}{r_m}\left(i_L + i_R\right),
@@ -207,12 +204,12 @@ Q_x = \frac{K_m}{r_m}\left(i_L + i_R\right),
 Q_y = \frac{K_m}{r_m}\left(i_L - i_R\right)
 \end{equation}
 
-\subsubsection*{Electrical coordinates}
+\subsubsection*{Electrical Coordinates}
 The non-conservative forces in the electrical part are the input voltages and the back-EMF of the motors:
 \begin{equation*}
 \Delta W = \left(u_{m,L} - K_m\dot\theta_L\right)\Delta q_L + \left(u_{m,R} - K_m\dot\theta_R\right)\Delta q_R
 \end{equation*}
-Using the same transformation, we get the generalized forces for $q_L$ and $q_R$:
+Using the same transformation, we get the generalised forces for $q_L$ and $q_R$:
 \begin{equation}
 \label{eq:gen_force_el}
 Q_{q_L} = u_{m,L} - \frac{K_m}{r_m}\left(\dot x + \dot y\right),
@@ -220,8 +217,8 @@ Q_{q_L} = u_{m,L} - \frac{K_m}{r_m}\left(\dot x + \dot y\right),
 Q_{q_R} = u_{m,R} - \frac{K_m}{r_m}\left(\dot x - \dot y\right)
 \end{equation}
 
-\subsubsection*{Lagrange equations}
-Using the fact this is a linear system and there are no potential energies we get:
+\subsubsection*{Lagrange Equations}
+Using the fact that this is a linear system and there are no potential energies we get:
 
 
 \begin{equation*}
@@ -239,7 +236,7 @@ Using the fact this is a linear system and there are no potential energies we ge
 \end{aligned}
 \end{equation*}
 
-And finally solving the Euler-Lagrange equation:
+And finally solving the Euler--Lagrange equation:
 
 \begin{equation*}
 \frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} - \frac{\partial \mathcal{L}}{\partial q} = -\frac{\partial D}{\partial \dot q} + \mathbf{Q},
@@ -268,10 +265,10 @@ L_m \frac{di_R}{dt} + R_m i_R + \frac{K_m}{r_m}\dot x - \frac{K_m}{r_m}\dot y - 
 \end{aligned}
 \end{equation*}
 
-Or with substitutions, we get final form of the four differential equations:
+Or with substitutions, we get the final form of the four differential equations:
 
 \begin{equation*}
-m_{eq} = m + \frac{2J_m}{r_m^2},
+m_{\mathrm{eq}} = m + \frac{2J_m}{r_m^2},
 \qquad
 b_x = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,x},
 \qquad
@@ -282,8 +279,8 @@ b_y = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}
 \label{eq:state_equations}
 \boxed{
 \begin{aligned}
-\ddot x &= -\frac{b_x}{m_{eq}}\dot x + \frac{K_m}{m_{eq} r_m}\left(i_L + i_R\right) \\
-\ddot y &= -\frac{b_y}{m_{eq}}\dot y + \frac{K_m}{m_{eq} r_m}\left(i_L - i_R\right) \\
+\ddot x &= -\frac{b_x}{m_{\mathrm{eq}}}\dot x + \frac{K_m}{m_{\mathrm{eq}} r_m}\left(i_L + i_R\right) \\
+\ddot y &= -\frac{b_y}{m_{\mathrm{eq}}}\dot y + \frac{K_m}{m_{\mathrm{eq}} r_m}\left(i_L - i_R\right) \\
 \frac{di_L}{dt} &= -\frac{K_m}{r_m L_m}\left(\dot x + \dot y\right) - \frac{R_m}{L_m} i_L + \frac{u_{m,L}}{L_m} \\
 \frac{di_R}{dt} &= -\frac{K_m}{r_m L_m}\left(\dot x - \dot y\right) - \frac{R_m}{L_m} i_R + \frac{u_{m,R}}{L_m}
 \end{aligned}}
@@ -309,8 +306,8 @@ Or in \textbf{state-space} form:
 \begin{bmatrix}
 \mstrut 0 & 0 & 1 & 0 & 0 & 0 \\
 \mstrut 0 & 0 & 0 & 1 & 0 & 0 \\
-\mstrut 0 & 0 & -\dfrac{b_x}{m_{eq}} & 0 & \dfrac{K_m}{m_{eq} r_m} & \dfrac{K_m}{m_{eq} r_m} \\
-\mstrut 0 & 0 & 0 & -\dfrac{b_y}{m_{eq}} & \dfrac{K_m}{m_{eq} r_m} & -\dfrac{K_m}{m_{eq} r_m} \\
+\mstrut 0 & 0 & -\dfrac{b_x}{m_{\mathrm{eq}}} & 0 & \dfrac{K_m}{m_{\mathrm{eq}} r_m} & \dfrac{K_m}{m_{\mathrm{eq}} r_m} \\
+\mstrut 0 & 0 & 0 & -\dfrac{b_y}{m_{\mathrm{eq}}} & \dfrac{K_m}{m_{\mathrm{eq}} r_m} & -\dfrac{K_m}{m_{\mathrm{eq}} r_m} \\
 \mstrut 0 & 0 & -\dfrac{K_m}{r_m L_m} & -\dfrac{K_m}{r_m L_m} & -\dfrac{R_m}{L_m} & 0 \\
 \mstrut 0 & 0 & -\dfrac{K_m}{r_m L_m} & \dfrac{K_m}{r_m L_m} & 0 & -\dfrac{R_m}{L_m}
 \end{bmatrix},
@@ -321,7 +318,7 @@ Or in \textbf{state-space} form:
 \end{bmatrix}
 \end{equation*}
 
-\subsubsection{Decoupling the x and y dynamics}
+\subsubsection{Decoupling the $x$ and $y$ Dynamics}
 To decouple the system, we introduce a set of useful substitutions:
 
 \begin{equation}
@@ -363,8 +360,8 @@ And by substituting \eqref{eq:decoupling_subs} into the first two equations of \
 \begin{equation}
 \label{eq:decoupled_motion}
 \begin{aligned}
-\ddot x &= -\frac{b_x}{m_{eq}}\dot x + \frac{K_m}{m_{eq} r_m} i_x \\
-\ddot y &= -\frac{b_y}{m_{eq}}\dot y + \frac{K_m}{m_{eq} r_m} i_y
+\ddot x &= -\frac{b_x}{m_{\mathrm{eq}}}\dot x + \frac{K_m}{m_{\mathrm{eq}} r_m} i_x \\
+\ddot y &= -\frac{b_y}{m_{\mathrm{eq}}}\dot y + \frac{K_m}{m_{\mathrm{eq}} r_m} i_y
 \end{aligned}
 \end{equation}
 
@@ -387,10 +384,10 @@ And finally:
 \tilde{\mathbf{A}} =
 \left[\begin{array}{ccc|ccc}
 \mstrut 0 & 1 & 0 & 0 & 0 & 0 \\
-\mstrut 0 & -\dfrac{b_x}{m_{eq}} & \dfrac{K_m}{m_{eq} r_m} & 0 & 0 & 0 \\
+\mstrut 0 & -\dfrac{b_x}{m_{\mathrm{eq}}} & \dfrac{K_m}{m_{\mathrm{eq}} r_m} & 0 & 0 & 0 \\
 \mstrut 0 & -\dfrac{2K_m}{r_m L_m} & -\dfrac{R_m}{L_m} & 0 & 0 & 0 \\ \hline
 \mstrut 0 & 0 & 0 & 0 & 1 & 0 \\
-\mstrut 0 & 0 & 0 & 0 & -\dfrac{b_y}{m_{eq}} & \dfrac{K_m}{m_{eq} r_m} \\
+\mstrut 0 & 0 & 0 & 0 & -\dfrac{b_y}{m_{\mathrm{eq}}} & \dfrac{K_m}{m_{\mathrm{eq}} r_m} \\
 \mstrut 0 & 0 & 0 & 0 & -\dfrac{2K_m}{r_m L_m} & -\dfrac{R_m}{L_m}
 \end{array}\right],
 \qquad
@@ -400,7 +397,7 @@ And finally:
 \end{bmatrix}
 \end{equation*}
 
-\subsection{Drawing shapes}
+\subsection{Drawing Shapes}
 \label{sec:drawing_shapes}
 
 Rearranging the decoupled equations of motion \eqref{eq:decoupled_motion}, we can express the currents needed to follow a prescribed motion of the tool head:
@@ -409,8 +406,8 @@ Rearranging the decoupled equations of motion \eqref{eq:decoupled_motion}, we ca
 \label{eq:inverse_currents}
 \boxed{
 \begin{aligned}
-i_x &= \frac{m_{eq} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x \\
-i_y &= \frac{m_{eq} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y
+i_x &= \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x \\
+i_y &= \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y
 \end{aligned}}
 \end{equation}
 
@@ -451,7 +448,7 @@ u_{m,L} = \tfrac{1}{2}\left(u_{m,x} + u_{m,y}\right),
 u_{m,R} = \tfrac{1}{2}\left(u_{m,x} - u_{m,y}\right)
 \end{equation}
 
-Since \eqref{eq:inverse_voltages} contains $\frac{di_x}{dt}$, and \eqref{eq:inverse_currents} contains $\ddot x$, the voltages depend on the third derivative of the position. Therefore, for any $C^3$ functions $x(t)$ and $y(t)$ describing the position of the tool head, we can derive an open-loop analytical solution for the input voltages, even if those voltages aren't realistic.
+Since \eqref{eq:inverse_voltages} contains $\frac{di_x}{dt}$, and \eqref{eq:inverse_currents} contains $\ddot x$, the voltages depend on the third derivative of the position. Therefore, for any $C^3$ functions $x(t)$ and $y(t)$ describing the position of the tool head, we can derive an open-loop analytical solution for the input voltages, even if those voltages are not realistic.
 
 \subsubsection*{Ellipse}
 An ellipse with centre $(h, k)$ and semi-axes $a$ and $b$ has the parametric form:
@@ -476,9 +473,9 @@ Substituting into \eqref{eq:inverse_currents}:
 
 \begin{equation*}
 \begin{aligned}
-i_x(t) &= -\frac{m_{eq} r_m}{K_m}\,a\cos t - \frac{b_x r_m}{K_m}\,a\sin t
-        = -\frac{r_m}{K_m}\,a\left[m_{eq}\cos t + b_x\sin t\right] \\
-i_y(t) &= \frac{r_m}{K_m}\,b\left[b_y\cos t - m_{eq}\sin t\right]
+i_x(t) &= -\frac{m_{\mathrm{eq}} r_m}{K_m}\,a\cos t - \frac{b_x r_m}{K_m}\,a\sin t
+        = -\frac{r_m}{K_m}\,a\left[m_{\mathrm{eq}}\cos t + b_x\sin t\right] \\
+i_y(t) &= \frac{r_m}{K_m}\,b\left[b_y\cos t - m_{\mathrm{eq}}\sin t\right]
 \end{aligned}
 \end{equation*}
 
@@ -486,11 +483,11 @@ And into \eqref{eq:inverse_voltages}:
 
 \begin{equation*}
 \begin{aligned}
-u_{m,x}(t) &= L_m\frac{r_m}{K_m}\,a\left[m_{eq}\sin t - b_x\cos t\right]
-            - R_m\frac{r_m}{K_m}\,a\left[m_{eq}\cos t + b_x\sin t\right]
+u_{m,x}(t) &= L_m\frac{r_m}{K_m}\,a\left[m_{\mathrm{eq}}\sin t - b_x\cos t\right]
+            - R_m\frac{r_m}{K_m}\,a\left[m_{\mathrm{eq}}\cos t + b_x\sin t\right]
             - \frac{2K_m}{r_m}\,a\sin t \\
-u_{m,y}(t) &= -L_m\frac{r_m}{K_m}\,b\left[m_{eq}\cos t + b_y\sin t\right]
-            + R_m\frac{r_m}{K_m}\,b\left[b_y\cos t - m_{eq}\sin t\right]
+u_{m,y}(t) &= -L_m\frac{r_m}{K_m}\,b\left[m_{\mathrm{eq}}\cos t + b_y\sin t\right]
+            + R_m\frac{r_m}{K_m}\,b\left[b_y\cos t - m_{\mathrm{eq}}\sin t\right]
             + \frac{2K_m}{r_m}\,b\cos t
 \end{aligned}
 \end{equation*}
@@ -503,7 +500,7 @@ u_{m,R}(t) = \tfrac{1}{2}\left(u_{m,x}(t) - u_{m,y}(t)\right)
 \end{equation*}
 we obtain the analytical open-loop solution for drawing the ellipse.
 
-Simulating the given system with parameters defined in Table~\ref{tab:symbols}, we get perfect alignment of the reference elipse.
+Simulating the given system with parameters defined in Table~\ref{tab:symbols}, we get near-perfect alignment with the reference ellipse.
 
 \begin{figure}[H]
   \centering
@@ -524,7 +521,7 @@ Simulating the given system with parameters defined in Table~\ref{tab:symbols}, 
   \label{fig:elipse}
 \end{figure}
 
-As this is open-loop control, this good result relies on a good paramater estimation. If we change the parameters of the model by $\pm 5\%$ we can see that an error immediatly arrises.
+As this is open-loop control, this good result relies on a good parameter estimation. If we change the parameters of the model by $\pm 5\%$ we can see that an error immediately arises.
 
 \begin{figure}[H]
   \centering
@@ -533,9 +530,9 @@ As this is open-loop control, this good result relies on a good paramater estima
   \label{fig:elipse_perturbed}
 \end{figure}
 
-\subsubsection*{Arbitrary drawing}
+\subsubsection*{Arbitrary Drawing}
 
-As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with cubic splines. Using Matlabs \textit{boundary} function to detect edges of shapes, in combination with \textit{cscvn} which gives us an interpolating cubic spline given a set of points, we can draw the \textit{TU Delft} logo\footnote{Different letter boundaries are connected by straight lines so the whole drawing can be one input function}.
+As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with quartic splines. Using MATLAB's \textit{bwboundaries} function to detect edges of shapes, in combination with \textit{spapi} which gives us an interpolating quartic spline given a set of points, we can draw the \textit{TU Delft} logo\footnote{Different letter boundaries are connected by straight lines so the whole drawing can be one input function}.
 
 \begin{figure}[H]
   \centering
@@ -556,7 +553,7 @@ As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will 
   \label{fig:tu_delft}
 \end{figure}
 
-Again, like with the elipse, this system is beacuse of sharp corners even more sensitive to inacuracies in the model parameters. If we again perturb the parameters by $\pm 5\%$ we see that control of this form would not be useful any more.
+Again, like with the ellipse, the logo, because of its sharp corners, is even more sensitive to inaccuracies in the model parameters. If we again perturb the parameters by $\pm 5\%$ we see that control of this form would not be useful anymore.
 
 \begin{figure}[H]
   \centering
@@ -566,8 +563,8 @@ Again, like with the elipse, this system is beacuse of sharp corners even more s
 \end{figure}
 
 
-\subsubsection{Modeling the Nozzle}
-In the following section we model the nozzle of the 3D printer \ref{fig:nozzle}. 
+\subsubsection{Modelling the Nozzle}
+In the following section we model the nozzle of the 3D printer (Figure~\ref{fig:nozzle}). 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.3\textwidth]{nozzle_sch.png}
@@ -576,29 +573,32 @@ In the following section we model the nozzle of the 3D printer \ref{fig:nozzle}.
 \end{figure}
 
 \todo{add nicer drawing of the system}
-The system consists of an electrical and thermodynamical part. A circuit consisting of an inductor $L_n$, capacitor $C_n$ and a heating resistor $R_n$. We choose the current through the inductor and the voltage acrose the capacitor, $i_l$ and $u_c$ respectivly, as first two states of our system. By solving the three Kirchoff equations we get two following first order differential equations:
+The system consists of an electrical and thermodynamical part. A circuit consisting of an inductor $L_n$, capacitor $C_n$ and a heating resistor $R_n$. We choose the current through the inductor and the voltage across the capacitor, $i_{L,n}$ and $u_c$ respectively, as first two states of our system. By solving the three Kirchhoff equations we get the following two first-order differential equations:
 
 \begin{equation}
   \label{eq:noz_el}
   \begin{aligned}
-    L_n\,\frac{di_L}{dt} &= U_n - u_c \\
-    C_n\,\frac{dU_c}{dt} &= i_L - \frac{u_c}{R_n(T_r)}
+    L_n\,\frac{di_{L,n}}{dt} &= u_n - u_c \\
+    C_n\,\frac{du_c}{dt} &= i_{L,n} - \frac{u_c}{R_n(T_r)}
   \end{aligned}
 \end{equation}
 
-Next, we model the thermal part. Except the thermal capacitance of the nozzle $C_{n,t}$, given in the task, we also model the thermal capacitance of the resistor\footnote{If we don't model the thermal capacitance of the resistor, we end up with an differential-algebraic equation (DAE)}. We choose two additional states, temperature of the resistor ($T_R$) and the temperature of the nozzle ($T_n$). Losses happening between the resistor and the nozzle are described by $R_{n,t}$, and the heat dissipation to the environment and to the fillanment is modeled with one variable $R_{env}$. The connection to the electrical part is the heat dissipated by the resistor $P_R = \frac{u_c^2}{R_n(T_R)}$. This gives us the following two equations which with \ref{eq:noz_el} fully describe the system:
+Next, we model the thermal part. Besides the thermal capacitance of the nozzle $C_{t,n}$, given in the task, we also model the thermal capacitance of the resistor $C_r$\footnote{If we do not model the thermal capacitance of the resistor, we end up with a differential-algebraic equation (DAE).}. We choose two additional states, temperature of the resistor ($T_r$) and the temperature of the nozzle ($T_n$). Losses happening between the resistor and the nozzle are described by $R_{t,n}$, and the heat dissipation to the environment and to the filament is modelled with one variable $R_{\mathrm{env}}$. The connection to the electrical part is the heat dissipated by the resistor $P_r = \frac{u_c^2}{R_n(T_r)}$. This gives us the following two equations which with \eqref{eq:noz_el} fully describe the system:
 
 \begin{equation}
+  \label{eq:noz_th}
   \begin{aligned}
-    C_{n,t}\,\frac{dT_n}{dt} &=  \frac{T_r - T_n}{R_{n,t}} - \frac{T_n - T_e}{R_{env}} \\
-C_r\,\frac{dT_r}{dt} &=  \frac{U_c^2}{R_n(T_r)} - \frac{T_r - T_n}{R_{n,t}} \\
+    C_{t,n}\,\frac{dT_n}{dt} &= \frac{T_r - T_n}{R_{t,n}} - \frac{T_n - T_e}{R_{\mathrm{env}}} \\
+    C_r\,\frac{dT_r}{dt} &= P_r - \frac{T_r - T_n}{R_{t,n}}
   \end{aligned}
 \end{equation}
 
 with
 
 \begin{equation}
-  R(T_r) = R_0\left[1 + \alpha\,(T_R - T_0)\right] 
+  R_n(T_r) = R_0\left[1 + \alpha\,(T_r - T_0)\right]
 \end{equation}
+where $R_0$ is the resistance at the reference temperature $T_0$ and $\alpha$ is the temperature coefficient of resistance.
 
-Due to the square voltage term and the temperature dependence of the resistance the system is very non-linear, although the very different time constants of two systems (thermal states change much slower compared to the electrical) can be exploited. Secondly, the model can reasonably be simplified by assuming a constant resistance. With that formulation we would get two linear systems connected by a \textit{nice} non-linear term.
+Due to the square voltage term and the temperature dependence of the resistance the system is very non-linear, although the very different time constants of two systems (thermal states change much slower compared to the electrical) can be exploited. Alternatively, the model can reasonably be simplified by assuming a constant resistance. With that formulation we would get two linear systems connected by a single non-linear term.
+
