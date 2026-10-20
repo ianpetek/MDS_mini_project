@@ -77,6 +77,8 @@ As the whole system is planar, we can see that there is no potential energy term
 
 \subsubsection*{Dissipative energy}
 Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system, two along each axis. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
+
+\todo{This needs to be corrected, not all bearing roll at all times, they depend on what motor rotates}
 \begin{equation}
 \label{eq:inverse_kinematics}
 \theta_{b,L} = \frac{ x +  y}{r_b},
@@ -500,3 +502,65 @@ u_{m,L}(t) = \tfrac{1}{2}\left(u_{m,x}(t) + u_{m,y}(t)\right),
 u_{m,R}(t) = \tfrac{1}{2}\left(u_{m,x}(t) - u_{m,y}(t)\right)
 \end{equation*}
 we obtain the analytical open-loop solution for drawing the ellipse.
+
+Simulating the given system with parameters defined in Table~\ref{tab:symbols}, we get perfect alignment of the reference elipse.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{elipse_simulated.pdf}
+    \caption{Reference and simulated trajectory.}
+    \label{fig:elipse_simulated}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{elipse_input.pdf}
+    \caption{Open-loop motor voltages.}
+    \label{fig:elipse_input}
+  \end{subfigure}
+  \caption{Open-loop drawing of an ellipse with nominal model parameters.}
+  \label{fig:elipse}
+\end{figure}
+
+As this is open-loop control, this good result relies on a good paramater estimation. If we change the parameters of the model by $\pm 5\%$ we can see that an error immediatly arrises.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{elipse_simulated_perturbed.pdf}
+  \caption{Open-loop drawing of an ellipse with model parameters perturbed by $\pm 5\%$.}
+  \label{fig:elipse_perturbed}
+\end{figure}
+
+\subsubsection*{Arbitrary drawing}
+
+As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with cubic splines. Using Matlabs \textit{boundary} function to detect edges of shapes, in combination with \textit{cscvn} which gives us an interpolating cubic spline given a set of points, we can draw the \textit{TU Delft} logo.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{tu_delft_draw.pdf}
+    \caption{Reference and simulated trajectory.}
+    \label{fig:tu_delft_draw}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{tu_delft_input.pdf}
+    \caption{Open-loop motor voltages.}
+    \label{fig:tu_delft_input}
+  \end{subfigure}
+  \caption{Open-loop drawing of the \textit{TU Delft} logo with nominal model parameters.}
+  \label{fig:tu_delft}
+\end{figure}
+
+Again, like with the elipse, this system is beacuse of sharp corners even more sensitive to inacuracies in the model parameters. If we again perturb the parameters by $\pm 5\%$ we see that control of this form would not be useful any more.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{tu_delft_perturbed.pdf}
+  \caption{Open-loop drawing of the \textit{TU Delft} logo with model parameters perturbed by $\pm 5\%$.}
+  \label{fig:tu_delft_perturbed}
+\end{figure}

@@ -23,14 +23,28 @@ y_ddd = -b*cos(t);
 
 u = [U_L(:) U_R(:)];
 
-sys = perturbed_system(50);
+sys = perturbed_system(0);
 [y, tSim, x] = lsim(sys, u, t, x0);
 
 xSim = x(:, 1:2);
 figure;
 plot(x_ref, y_ref, 'r--', xSim(:, 1), xSim(:, 2), 'b-', 'LineWidth', 1.5);
-axis equal; grid on;
+axis equal; axis padded; grid on;
 legend('Reference ellipse', 'Simulated trajectory');
+paperStyle(gcf, 8.85);
+exportgraphics(gcf,'elipse_simulated.pdf','ContentType','vector');
+
+figure
+plot(t, U_L, 'b-', t, U_R, 'r-', 'LineWidth', 1.2);
+grid on;
+xlabel('t [s]'); ylabel('u [V]');
+legend('u_{m,L}', 'u_{m,R}');
+title('Motor inputs');
+paperStyle(gcf, 8.85);
+exportgraphics(gcf,'elipse_input.pdf','ContentType','vector');
+
+figure
+
 clear
 
 %% 2. arbitrary spline
@@ -39,14 +53,14 @@ mask = imread("tudelft.png", "png", "BackgroundColor",[1,1,1]);
 % to black and white
 mask = rgb2gray(mask)<255;
 [B, ~] = bwboundaries(mask);
-
-imshow(mask);
-hold on;
-for i = 1:numel(B)
-    boundary = B{i};
-    plot(boundary(:, 2), boundary(:, 1), 'r', 'LineWidth', 1.5);
-end
-hold off;
+% 
+% imshow(mask);
+% hold on;
+% for i = 1:numel(B)
+%     boundary = B{i};
+%     plot(boundary(:, 2), boundary(:, 1), 'r', 'LineWidth', 1.5);
+% end
+% hold off;
 
 numPoints = 120;   
 all_ctrl = [];               
@@ -78,16 +92,16 @@ all_ctrl = margin + px_to_m * all_ctrl;
 
 sp = cscvn(all_ctrl);
 
-figure('Color', 'white');
-hold on; 
-grid on; 
-axis equal;
-title('All Drawing Contours as Independent Splines');
-xlabel('X (pixels)'); 
-ylabel('Y (pixels)');
-%fnplt(sp, 2);
-plot(all_ctrl(1, :), all_ctrl(2, :))
-hold off;
+% figure('Color', 'white');
+% hold on;
+% grid on;
+% axis equal;
+% title('All Drawing Contours as Independent Splines');
+% xlabel('X (pixels)');
+% ylabel('Y (pixels)');
+% fnplt(sp, 2);
+% plot(all_ctrl(1, :), all_ctrl(2, :));
+% hold off;
 
 v_avg   = 0.05;
 s_int   = fnbrk(sp, 'interval');
@@ -115,26 +129,28 @@ t = linspace(0, T, numEval);
 
 u = [U_L(:) U_R(:)];
 
-sys = perturbed_system(0);
+sys = perturbed_system(5);
 [y_out, tSim, x_out] = lsim(sys, u, t, x0);
 
 
 figure;
-tiledlayout(2, 1);
-
-nexttile;
 plot(x, y, 'r--', x_out(:, 1), x_out(:, 2), 'b-', 'LineWidth', 1.5);
-axis equal; grid on;
+axis equal; grid on;axis padded;
 xlabel('x [m]'); ylabel('y [m]');
 legend('Reference', 'Simulated trajectory');
 title('Trajectory');
+paperStyle(gcf, 8.85);
+exportgraphics(gcf,'tu_delft_draw.pdf','ContentType','vector');
 
-nexttile;
+figure;
 plot(t, U_L, 'b-', t, U_R, 'r-', 'LineWidth', 1.2);
-grid on;
+grid on; 
 xlabel('t [s]'); ylabel('u [V]');
 legend('u_{m,L}', 'u_{m,R}');
 title('Motor inputs');
+paperStyle(gcf, 8.85);
+exportgraphics(gcf,'tu_delft_input.pdf','ContentType','vector');
+
 
 %% local funcs
 function [U_L, U_R, U_mx, U_my, x0] = trajectory_input(x, x_d, x_dd, x_ddd, y, y_d, y_dd, y_ddd)
