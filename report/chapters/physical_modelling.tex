@@ -602,3 +602,179 @@ where $R_0$ is the resistance at the reference temperature $T_0$ and $\alpha$ is
 
 Due to the square voltage term and the temperature dependence of the resistance the system is very non-linear, although the very different time constants of two systems (thermal states change much slower compared to the electrical) can be exploited. Alternatively, the model can reasonably be simplified by assuming a constant resistance. With that formulation we would get two linear systems connected by a single non-linear term.
 
+\clearpage
+
+\subsubsection{Printing a circle of filament}
+
+
+\subsubsection*{Moving-Boundary Heat Problem}
+ 
+ \todo{better notation, proper plots, explanation text}
+Cross-section $a \times a$, element length $\Delta L$; three faces to the environment ($T_e$), one face to the heating plate ($T_p$).
+ 
+\paragraph{Energy balance}
+\[
+\partial_t u = -\nabla\cdot\phi + f, \qquad u = \rho c\,T, \qquad \phi = -\kappa \nabla T
+\qquad\Longrightarrow\qquad
+\partial_t T = \frac{\kappa}{\rho c}\,\nabla^2 T + \frac{f}{\rho c}
+\]
+\[
+[u] = \mathrm{J/m^3}, \qquad [\phi] = \mathrm{W/m^2}, \qquad [f] = \mathrm{W/m^3}
+\]
+ 
+\paragraph{Heat exchange}
+\[
+\Delta A_e = 3a\,\Delta L, \qquad \Delta A_p = a\,\Delta L, \qquad V = a^2\,\Delta L
+\]
+\[
+\dot Q = K_e\,\Delta A_e\,(T_e - T) + K_p\,\Delta A_p\,(T_p - T)
+\qquad \big[\mathrm{W/(m^2K)}\cdot \mathrm{m^2}\cdot\mathrm{K} = \mathrm{W}\big]
+\]
+\[
+f = \frac{\dot Q}{V} = \frac{1}{a}\Big[\,3K_e\,(T_e - T) + K_p\,(T_p - T)\,\Big]
+\]
+ 
+\paragraph{Result}
+\[
+\boxed{\;\partial_t T = k\,\partial_{xx} T + \alpha\,T + \beta\;}
+\]
+\[
+k = \frac{\kappa}{\rho c}, \qquad
+\alpha = -\frac{3K_e + K_p}{a\,\rho c}, \qquad
+\beta = \frac{3K_e T_e + K_p T_p}{a\,\rho c}
+\]
+ 
+\subsubsection*{2. Front Fixing}
+John Crank, Free and Moving Boundary Problems
+\[
+\xi = \frac{x}{s(t)}, \qquad 0 \le \xi \le 1, \qquad
+s(t) = s_0 + s_1 t, \qquad \dot s = s_1
+\]
+ 
+\paragraph{Derivatives}
+\[
+\frac{\partial T}{\partial x} = \frac{1}{s}\,\frac{\partial T}{\partial \xi},
+\qquad
+\frac{\partial^2 T}{\partial x^2} = \frac{1}{s^2}\,\frac{\partial^2 T}{\partial \xi^2}
+\]
+\[
+\left(\frac{\partial T}{\partial t}\right)_{\!x}
+= \frac{\partial T}{\partial \xi}\left(\frac{\partial \xi}{\partial t}\right)_{\!x} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
+= -\frac{x\,\dot s}{s^2}\,\frac{\partial T}{\partial \xi} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
+= -\frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
+\]
+ 
+\paragraph{Transformed equation}
+\[
+\boxed{\;\left(\frac{\partial T}{\partial t}\right)_{\!\xi}
+= \frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi}
++ \frac{k}{s^2}\,\frac{\partial^2 T}{\partial \xi^2}
++ \alpha\,T + \beta\;}
+\]
+ 
+\subsubsection*{3. Boundary and Initial Conditions}
+ 
+\[
+T(1, t) = T_n \quad \text{(nozzle temperature at } x = s(t)\text{)}
+\]
+\[
+\partial_x T(0, t) = 0
+\quad\Longrightarrow\quad
+\frac{T_1^j - T_0^j}{\Delta \xi} = 0
+\quad\Longrightarrow\quad
+T_0^j = T_1^j
+\]
+\[
+T_i^0 = T_n, \qquad s(0) = s_0 \ \text{(small)}
+\]
+ 
+\subsubsection*{4. Discretisation (implicit)}
+ 
+\[
+\xi_i = i\,\Delta\xi, \quad \Delta \xi = \tfrac{1}{N}, \quad i = 0,\dots,N;
+\qquad t_j = j\,\Delta t; \qquad T_i^j \approx T(\xi_i, t_j)
+\]
+\[
+\frac{\partial T}{\partial t} \approx \frac{T_i^j - T_i^{j-1}}{\Delta t},
+\qquad
+\frac{\partial T}{\partial \xi} \approx \frac{T_{i+1}^j - T_i^j}{\Delta \xi},
+\qquad
+\frac{\partial^2 T}{\partial \xi^2} \approx \frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
+\]
+\[
+\gamma_i = \frac{\xi_i\,\dot s\,\Delta t}{s\,\Delta \xi},
+\qquad
+g = \frac{k\,\Delta t}{s^2\,\Delta \xi^2},
+\qquad s,\ \dot s \ \text{evaluated at } t_j
+\]
+\[
+\boxed{\;T_i^j\big[\,1 + \gamma_i + 2g - \alpha\,\Delta t\,\big]
+= g\,T_{i-1}^j + (\gamma_i + g)\,T_{i+1}^j + T_i^{j-1} + \beta\,\Delta t\;}
+\]
+
+ \subsubsection*{Stability}
+\todo{von Neumann probably}
+
+\subsubsection*{5. Linear System at $t = t_j$}
+ 
+\[
+d_i = 1 + \gamma_i + 2g - \alpha\,\Delta t, \qquad e_i = \gamma_i + g
+\]
+\[
+\begin{bmatrix}
+1 & -1 & & & & \\
+-g & d_1 & -e_1 & & & \\
+ & -g & d_2 & -e_2 & & \\
+ & & \ddots & \ddots & \ddots & \\
+ & & & -g & d_{N-1} & -e_{N-1} \\
+ & & & & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+T_0^j \\ T_1^j \\ T_2^j \\ \vdots \\ T_{N-1}^j \\ T_N^j
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\ T_1^{j-1} + \beta\,\Delta t \\ T_2^{j-1} + \beta\,\Delta t \\ \vdots \\ T_{N-1}^{j-1} + \beta\,\Delta t \\ T_n
+\end{bmatrix}
+\]
+ 
+%--------------------------------------------------------------
+\subsubsection*{6. After the Boundary Stops (Closed Ring)}
+ 
+\[
+\dot s = 0 \;\Rightarrow\; \gamma_i = 0, \qquad s = L, \qquad
+T_N^j \equiv T_0^j \ \text{(first and last node coincide)}
+\]
+\[
+d = 1 + 2g - \alpha\,\Delta t
+\]
+\[
+\begin{bmatrix}
+d & -g & & & -g \\
+-g & d & -g & & \\
+ & \ddots & \ddots & \ddots & \\
+ & & -g & d & -g \\
+-g & & & -g & d
+\end{bmatrix}
+\begin{bmatrix}
+T_0^j \\ T_1^j \\ \vdots \\ T_{N-2}^j \\ T_{N-1}^j
+\end{bmatrix}
+=
+\begin{bmatrix}
+T_0^{j-1} + \beta\,\Delta t \\ T_1^{j-1} + \beta\,\Delta t \\ \vdots \\ T_{N-2}^{j-1} + \beta\,\Delta t \\ T_{N-1}^{j-1} + \beta\,\Delta t
+\end{bmatrix}
+\]
+First step after connection:
+\[
+T_0^{j-1} \leftarrow \tfrac{1}{2}\big(T_0^{j-1} + T_N^{j-1}\big)
+\]
+
+\todo{Choose and display the chosen model parameters}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{initial_pde_plot.png}
+  \caption{INITIAL PLOT, CHANGE.}
+  \label{fig:pde_plot}
+\end{figure}
+
