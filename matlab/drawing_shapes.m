@@ -80,8 +80,6 @@ for i = 1:numel(B)
 end
 
 
-all_ctrl(:, end+1) = all_ctrl(:, 1);
-
 print_area = 0.29;
 draw_size  = 0.20;
 margin     = (print_area - draw_size) / 2;
@@ -90,7 +88,11 @@ px_to_m    = draw_size / max(size(mask));
 all_ctrl = all_ctrl - min(all_ctrl, [], 2);
 all_ctrl = margin + px_to_m * all_ctrl;
 
-sp = cscvn(all_ctrl);
+s  = [0 cumsum(vecnorm(diff(all_ctrl, 1, 2)))];
+[s, iu] = unique(s);  
+sq = linspace(0, s(end), ceil(s(end) / median(diff(s))) + 1);
+pts = interp1(s, all_ctrl(:, iu)', sq)';
+sp = spapi(6, sq, pts);
 
 % figure('Color', 'white');
 % hold on;
@@ -129,7 +131,7 @@ t = linspace(0, T, numEval);
 
 u = [U_L(:) U_R(:)];
 
-sys = perturbed_system(5);
+sys = perturbed_system(0);
 [y_out, tSim, x_out] = lsim(sys, u, t, x0);
 
 
