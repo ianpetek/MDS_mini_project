@@ -535,7 +535,7 @@ As this is open-loop control, this good result relies on a good paramater estima
 
 \subsubsection*{Arbitrary drawing}
 
-As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with cubic splines. Using Matlabs \textit{boundary} function to detect edges of shapes, in combination with \textit{cscvn} which gives us an interpolating cubic spline given a set of points, we can draw the \textit{TU Delft} logo.
+As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with cubic splines. Using Matlabs \textit{boundary} function to detect edges of shapes, in combination with \textit{cscvn} which gives us an interpolating cubic spline given a set of points, we can draw the \textit{TU Delft} logo\footnote{Different letter boundaries are connected by straight lines so the whole drawing can be one input function}.
 
 \begin{figure}[H]
   \centering
@@ -564,3 +564,41 @@ Again, like with the elipse, this system is beacuse of sharp corners even more s
   \caption{Open-loop drawing of the \textit{TU Delft} logo with model parameters perturbed by $\pm 5\%$.}
   \label{fig:tu_delft_perturbed}
 \end{figure}
+
+
+\subsubsection{Modeling the Nozzle}
+In the following section we model the nozzle of the 3D printer \ref{fig:nozzle}. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.3\textwidth]{nozzle_sch.png}
+  \caption{Schematic of the nozzle heating circuit.}
+  \label{fig:nozzle}
+\end{figure}
+
+\todo{add nicer drawing of the system}
+The system consists of an electrical and thermodynamical part. A circuit consisting of an inductor $L_n$, capacitor $C_n$ and a heating resistor $R_n$. We choose the current through the inductor and the voltage acrose the capacitor, $i_l$ and $u_c$ respectivly, as first two states of our system. By solving the three Kirchoff equations we get two following first order differential equations:
+
+\begin{equation}
+  \label{eq:noz_el}
+  \begin{aligned}
+    L_n\,\frac{di_L}{dt} &= U_n - u_c \\
+    C_n\,\frac{dU_c}{dt} &= i_L - \frac{u_c}{R_n(T_r)}
+  \end{aligned}
+\end{equation}
+
+Next, we model the thermal part. Except the thermal capacitance of the nozzle $C_{n,t}$, given in the task, we also model the thermal capacitance of the resistor\footnote{If we don't model the thermal capacitance of the resistor, we end up with an differential-algebraic equation (DAE)}. We choose two additional states, temperature of the resistor ($T_R$) and the temperature of the nozzle ($T_n$). Losses happening between the resistor and the nozzle are described by $R_{n,t}$, and the heat dissipation to the environment and to the fillanment is modeled with one variable $R_{env}$. The connection to the electrical part is the heat dissipated by the resistor $P_R = \frac{u_c^2}{R_n(T_R)}$. This gives us the following two equations which with \ref{eq:noz_el} fully describe the system:
+
+\begin{equation}
+  \begin{aligned}
+    C_{n,t}\,\frac{dT_n}{dt} &=  \frac{T_r - T_n}{R_{n,t}} - \frac{T_n - T_e}{R_{env}} \\
+C_r\,\frac{dT_r}{dt} &=  \frac{U_c^2}{R_n(T_r)} - \frac{T_r - T_n}{R_{n,t}} \\
+  \end{aligned}
+\end{equation}
+
+with
+
+\begin{equation}
+  R(T_r) = R_0\left[1 + \alpha\,(T_R - T_0)\right] 
+\end{equation}
+
+Due to the square voltage term and the temperature dependence of the resistance the system is very non-linear, although the very different time constants of two systems (thermal states change much slower compared to the electrical) can be exploited. Secondly, the model can reasonably be simplified by assuming a constant resistance. With that formulation we would get two linear systems connected by a \textit{nice} non-linear term.
