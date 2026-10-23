@@ -1,0 +1,23 @@
+case,description,printing_state,filament_change_state,external_input,system_feedback,retries_left,realistic
+1,Start filament change (C) while printer idle,IDLE,IDLE,C,,3,yes
+2,Filament runout (F) while printer idle,IDLE,IDLE,F,,3,yes
+3,Filament change (C) requested mid-print,IN_PROGRESS,IDLE,C,,3,yes
+4,Filament runout (F) mid-print,IN_PROGRESS,IDLE,F,,3,yes
+5,Filament change (C) while print is paused,PAUSED,IDLE,C,,3,yes
+6,Filament runout (F) while print is paused,PAUSED,IDLE,F,,3,yes
+11,Moving to wiping location succeeds first try,IDLE,MOVING_TO_WIPING_LOCATION,,MOVING_TO_WIPING_LOCATION_SUCCESSFUL,3,yes
+12,Moving to wiping location fails first try,IDLE,MOVING_TO_WIPING_LOCATION,,MOVING_TO_WIPING_LOCATION_FAILURE,3,yes
+13,Moving to wiping location fails with no retries left,IDLE,MOVING_TO_WIPING_LOCATION,,MOVING_TO_WIPING_LOCATION_FAILURE,0,yes
+14,Moving to wiping location succeeds after a retry,PAUSED,MOVING_TO_WIPING_LOCATION,,MOVING_TO_WIPING_LOCATION_SUCCESSFUL,1,yes
+15,Wiping succeeds during a paused print,PAUSED,WIPING,,WIPING_SUCCESSFUL,3,yes
+16,Wiping fails with no retries left,PAUSED,WIPING,,WIPING_FAILURE,0,yes
+17,Nozzle cooling succeeds after a retry,IDLE,NOZZLE_COOLING,,NOZZLE_COOLING_SUCCESSFUL,2,yes
+18,Loading filament fails with one retry left,IDLE,LOADING_FILAMENT,,LOADING_FILAMENT_FAILURE,1,yes
+19,Nozzle heating succeeds first try (printer idle),IDLE,NOZZLE_HEATING,,NOZZLE_HEATING_SUCCESSFUL,3,yes
+20,Nozzle heating succeeds after a retry (printer idle),IDLE,NOZZLE_HEATING,,NOZZLE_HEATING_SUCCESSFUL,2,yes
+21,Nozzle heating succeeds first try (print paused),PAUSED,NOZZLE_HEATING,,NOZZLE_HEATING_SUCCESSFUL,3,yes
+22,Nozzle heating succeeds after retries (print paused),PAUSED,NOZZLE_HEATING,,NOZZLE_HEATING_SUCCESSFUL,1,yes
+23,Nozzle heating fails with no retries left (print paused),PAUSED,NOZZLE_HEATING,,NOZZLE_HEATING_FAILURE,0,yes
+24,C pressed again while wiping,PAUSED,WIPING,C,,2,yes
+25,F triggered again while loading filament,PAUSED,LOADING_FILAMENT,F,,3,yes
+26,C pressed in the same tick as a cooling feedback,IDLE,NOZZLE_COOLING,C,NOZZLE_COOLING_SUCCESSFUL,2,yes
