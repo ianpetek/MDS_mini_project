@@ -17,7 +17,7 @@ mu_ly = 0.001;     % bearing friction, linear y          [N s/m]
 
 m_eq = m + 2*J_m/r_m^2;
 b_x  = 8*mu_r/r_b^2 + 2*mu_lx;
-b_y  = 8*mu_r/r_b^2 + 2*mu_ly;
+b_y  = 4*mu_r/r_b^2 + 2*mu_ly;
 
 %% Coupled model: x = [x; y; xdot; ydot; i_L; i_R], u = [u_mL; u_mR]
 kf = K_m/(m_eq*r_m);

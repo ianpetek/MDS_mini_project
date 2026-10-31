@@ -78,26 +78,46 @@ As the whole system is planar, we can see that there are no potential energy ter
 \subsubsection*{Dissipative Energy}
 Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system, two along each axis. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
 
-\todo{This needs to be corrected, not all bearings roll at all times, they depend on what motor rotates}
 \begin{equation}
 \label{eq:inverse_kinematics}
-\theta_{b,L} = \frac{ x +  y}{r_b},
+\theta_{b,L1} = \frac{ x +  y}{r_b},
 \qquad
-\theta_{b,R} = \frac{ x - y}{r_b}
+\theta_{b,R1} = \frac{ x - y}{r_b}
 \end{equation}
-Then, for each side we get rotational dissipative energy:
+
+These are used for the two fixed bearings on each belt. Then, for each side we get rotational dissipative energy:
 \begin{equation*}
 \begin{aligned}
-D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L}^2\,\mu_r 
-    = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
-D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R}^2\,\mu_r 
-    = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
+D_{L1} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L1}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
+D_{R1} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R1}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
+\end{aligned}
+\end{equation*}
+
+For the two carriage bearings, if we assume the belt to be horizontal on the carriage like Figure~\ref{fig:printer_schematic} shows them, they are rotating only when the carriage moves along the $x$ axis.
+
+\begin{equation}
+\label{eq:carriage_kinematics}
+\theta_{b,L2} = \frac{ x }{r_b},
+\qquad
+\theta_{b,R2} = \frac{ x }{r_b}
+\end{equation}
+
+With that we get two more terms:
+
+\begin{equation*}
+\begin{aligned}
+D_{L2} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L2}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\dot x^2 \\
+D_{R2} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R2}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\dot x^2
 \end{aligned}
 \end{equation*}
 
 Then simply combining them:
 \begin{equation*}
-\boxed{D_{\mathrm{rot}} = 4\,\frac{\mu_r}{r_b^2}\left[\dot x^2 + \dot y^2\right]}
+\boxed{D_{\mathrm{rot}} = \frac{\mu_r}{r_b^2}\left[4\dot x^2 + 2\dot y^2\right]}
 \end{equation*}
 
 Similarly, we get the linear dissipative energy:
@@ -110,7 +130,7 @@ Then, combining the terms we get:
 \begin{equation}
 \label{eq:dissipation_mech}
 D_{\mathrm{mech}} = \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,x}\right]\dot x^2
-    + \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
+    + \left[2\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
 \end{equation}
 
 \clearpage
@@ -178,7 +198,7 @@ m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 \end{bmatrix} \\
 \mathbf{N} &= \begin{bmatrix}
 8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,x} & 0 & 0 & 0 \\
-0 & 8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,y} & 0 & 0 \\
+0 & 4\dfrac{\mu_r}{r_b^2} + 2\mu_{l,y} & 0 & 0 \\
 0 & 0 & R_m & 0 \\
 0 & 0 & 0 & R_m
 \end{bmatrix}
@@ -258,7 +278,7 @@ Expanding back out of matrix form we get:
   + \left(8\frac{\mu_r}{r_b^2} + 2\mu_{l,x}\right)\dot x
   - \frac{K_m}{r_m} i_L - \frac{K_m}{r_m} i_R &= 0 \\
 \left(m + J_m\frac{2}{r_m^2}\right)\ddot y
-  + \left(8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right)\dot y
+  + \left(4\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right)\dot y
   - \frac{K_m}{r_m} i_L + \frac{K_m}{r_m} i_R &= 0 \\
 L_m \frac{di_L}{dt} + R_m i_L + \frac{K_m}{r_m}\dot x + \frac{K_m}{r_m}\dot y - u_{m,L} &= 0 \\
 L_m \frac{di_R}{dt} + R_m i_R + \frac{K_m}{r_m}\dot x - \frac{K_m}{r_m}\dot y - u_{m,R} &= 0
@@ -272,7 +292,7 @@ m_{\mathrm{eq}} = m + \frac{2J_m}{r_m^2},
 \qquad
 b_x = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,x},
 \qquad
-b_y = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}
+b_y = 4\frac{\mu_r}{r_b^2} + 2\mu_{l,y}
 \end{equation*}
 
 \begin{equation}

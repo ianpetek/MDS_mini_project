@@ -26,7 +26,7 @@ p.T_n_ref = 240 + 273.15;   % target nozzle temperature   [K]
 %% Derived quantities
 p.m_eq = p.m + 2*p.J_m/p.r_m^2;            % equivalent mass   [kg]
 p.b_x  = 8*p.mu_r/p.r_b^2 + 2*p.mu_lx;     % damping x         [N s/m]
-p.b_y  = 8*p.mu_r/p.r_b^2 + 2*p.mu_ly;     % damping y         [N s/m]
+p.b_y  = 4*p.mu_r/p.r_b^2 + 2*p.mu_ly;     % damping y         [N s/m]
 p.kf   = p.K_m/(p.m_eq*p.r_m);
 p.ke   = p.K_m/(p.r_m*p.L_m);
 
