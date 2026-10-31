@@ -335,3 +335,4 @@ matlab/*.pdf
 
 **/**/slprj
 **/**/*.slxc
+matlab/sprj/*
