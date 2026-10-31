@@ -23,6 +23,23 @@ dx(ix.y)    = ydot;
 dx(ix.xdot) = -p.b_x/p.m_eq*xdot + p.kf*(i_L + i_R);
 dx(ix.ydot) = -p.b_y/p.m_eq*ydot + p.kf*(i_L - i_R);
 
+x_into_low  = x(ix.x) <= -p.L_bed && (xdot < 0 || dx(ix.xdot) < 0);
+x_into_high = x(ix.x) >= p.L_bed && (xdot > 0 || dx(ix.xdot) > 0);
+if x_into_low || x_into_high
+    dx(ix.x)    = 0;                    
+    dx(ix.xdot) = -xdot*100;   
+end
+
+% y axis
+y_into_low  = x(ix.y) <= -p.L_bed && (ydot < 0 || dx(ix.ydot) < 0);
+y_into_high = x(ix.y) >= p.L_bed && (ydot > 0 || dx(ix.ydot) > 0);
+if y_into_low || y_into_high
+    dx(ix.y)    = 0;
+    dx(ix.ydot) = -ydot*100;
+end
+
+
+
 % Nozzle: u_c = u_n, so the heater sees the input voltage directly
 R_n = p.R0*(1 + p.alpha*(T_r - p.T0));
 P_r = u_n^2/R_n;

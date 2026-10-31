@@ -113,8 +113,8 @@ clear kf ke R_m L_m m_eq Ax Ay Bi C Ct
 
 %% Bus mapping (only measurable values)
 % state_names = {'x','y','xdot','ydot','i_L','i_R','i_Ln','u_c','T_n','T_r'};
-state_names = {'x','y','T_n'};
-indices = [1,2,5];
+state_names = {'x','y','xdot','ydot','T_n'};
+indices = [1,2,3,4,5];
 
 elems = Simulink.BusElement.empty;
 for k = 1:numel(state_names)
@@ -124,3 +124,35 @@ for k = 1:numel(state_names)
 end
 PlantState = Simulink.Bus;
 PlantState.Elements = elems;
+
+
+%% Filament change (Q2.1 / Q3.1)
+p.wipe_x      = 0;     % wipe-tower location [m]
+p.wipe_y      = 0;
+p.tol         = 0.005; % "arrived" tolerance [m]
+p.t_timeout   = 30;    % a step counts as failed after this [s]
+p.t_wipe      = 3;     % time spent wiping [s]
+p.t_load      = 2;     % time to load new filament [s]
+p.max_retries = 3;
+%% Print path: one row per point, columns [x y] in metres
+th = linspace(0, 2*pi, 41)';            % example: circle, 40 segments
+p.path = [0.0 0.0;
+    0.05 0.0;
+    0.05 0.05;
+    0.0 0.05;
+    0.0 0.0];
+p.n_path   = size(p.path, 1);           
+p.tol_pass = 0.003;                     % "close enough, next point" [m]
+
+PAUSE_pressed = [0 0];
+
+%% Filament change inputs: [time value]
+C_pressed = [0 0];   % press C at 15 s (mid-print)
+F_pressed = [0 0];               % never
+
+%% Filament change settings
+p.wipe_x = 0;  p.wipe_y = 0.5;   % wipe location [m]
+p.t_wipe = 3;                  % wiping time [s]
+p.t_load = 5;                  % loading time [s]
+p.fil_max = 13;
+p.L_bed = 0.5;  
