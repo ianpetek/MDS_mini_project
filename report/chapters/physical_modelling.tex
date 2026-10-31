@@ -592,7 +592,6 @@ In the following section we model the nozzle of the 3D printer (Figure~\ref{fig:
   \label{fig:nozzle}
 \end{figure}
 
-\todo{add nicer drawing of the system}
 The system consists of an electrical and thermodynamical part. A circuit consisting of an inductor $L_n$, capacitor $C_n$ and a heating resistor $R_n$. We choose the current through the inductor and the voltage across the capacitor, $i_{L,n}$ and $u_c$ respectively, as first two states of our system. By solving the three Kirchhoff equations we get the following two first-order differential equations:
 
 \begin{equation}
@@ -626,128 +625,226 @@ Due to the square voltage term and the temperature dependence of the resistance 
 
 \subsubsection{Printing a circle of filament}
 
+In this section a 1D distributed parameter model for the cooling of a square cross-section filament on a heating plate and a numerical formulation of the problem are derived.
 
-\subsubsection*{Moving-Boundary Heat Problem}
- 
- \todo{better notation, proper plots, explanation text}
-Cross-section $a \times a$, element length $\Delta L$; three faces to the environment ($T_e$), one face to the heating plate ($T_p$).
- 
-\paragraph{Energy balance}
-\[
-\partial_t u = -\nabla\cdot\phi + f, \qquad u = \rho c\,T, \qquad \phi = -\kappa \nabla T
-\qquad\Longrightarrow\qquad
+\subsubsection*{Modelling the system}
+We take a cross-section of $a \times a$ with length $\Delta L$. Temperature is assumed uniform across the $a \times a$ cross-section to keep the model one dimensional in space. Three faces exchange heat with the environment ($T_e$), and one face with the heating plate ($T_p$).
+
+The problem is modelled using the heat equation, Fourier's law gives the flux~\eqref{eq:fourier}. Writing the energy density as~\eqref{eq:energy_density} and substituting both into the energy balance yields the heat equation~\eqref{eq:heat_equation}:
+
+\begin{align}
+\partial_t u &= -\nabla\cdot\phi + f
+  \label{eq:energy_balance} \\
+u &= \rho c\,T
+  \label{eq:energy_density} \\
+\phi &= -\kappa \nabla T
+  \label{eq:fourier}
+\end{align}
+
+\begin{equation}
+\label{eq:heat_equation}
 \partial_t T = \frac{\kappa}{\rho c}\,\nabla^2 T + \frac{f}{\rho c}
-\]
-\[
-[u] = \mathrm{J/m^3}, \qquad [\phi] = \mathrm{W/m^2}, \qquad [f] = \mathrm{W/m^3}
-\]
- 
-\paragraph{Heat exchange}
-\[
+\end{equation}
+
+Secondly, we need to describe the heat exchange of the segment $\Delta L$. Using Newton's cooling law we can express the heat transfer through the surfaces as~\eqref{eq:newton_cooling}. Dividing that by $V$ gives us the heat transfer per unit volume~\eqref{eq:heat_source}.
+
+\begin{equation*}
 \Delta A_e = 3a\,\Delta L, \qquad \Delta A_p = a\,\Delta L, \qquad V = a^2\,\Delta L
-\]
-\[
-\dot Q = K_e\,\Delta A_e\,(T_e - T) + K_p\,\Delta A_p\,(T_p - T)
-\qquad \big[\mathrm{W/(m^2K)}\cdot \mathrm{m^2}\cdot\mathrm{K} = \mathrm{W}\big]
-\]
-\[
-f = \frac{\dot Q}{V} = \frac{1}{a}\Big[\,3K_e\,(T_e - T) + K_p\,(T_p - T)\,\Big]
-\]
- 
-\paragraph{Result}
-\[
-\boxed{\;\partial_t T = k\,\partial_{xx} T + \alpha\,T + \beta\;}
-\]
-\[
+\end{equation*}
+
+\begin{align}
+\dot Q &= K_e\,\Delta A_e\,(T_e - T) + K_p\,\Delta A_p\,(T_p - T)
+  \label{eq:newton_cooling} \\
+f &= \frac{\dot Q}{V} = \frac{1}{a}\Big[\,3K_e\,(T_e - T) + K_p\,(T_p - T)\,\Big]
+  \label{eq:heat_source}
+\end{align}
+
+Substituting everything back into~\eqref{eq:heat_equation}, gives us the final PDE:
+
+\begin{equation}
+\label{eq:filament_pde}
+\boxed{\partial_t T = k\,\partial_{xx} T + \alpha\,T + \beta}
+\end{equation}
+
+\begin{equation*}
 k = \frac{\kappa}{\rho c}, \qquad
 \alpha = -\frac{3K_e + K_p}{a\,\rho c}, \qquad
 \beta = \frac{3K_e T_e + K_p T_p}{a\,\rho c}
-\]
+\end{equation*}
  
-\subsubsection*{2. Front Fixing}
-John Crank, Free and Moving Boundary Problems
-\[
+\subsubsection*{Front Fixing}
+Due to needing to solve the problem while the nozzle is still moving, this becomes a moving boundary problem. A method from~\cite{crank1984free} is used. We introduce a transformation $\xi$, that maps our space to the interval $[0, 1]$, with $s(t)$ being the position of our boundary, and consequently $\dot s(t)$ the speed of the boundary/nozzle.
+
+\begin{equation}
+\label{eq:front_fixing}
 \xi = \frac{x}{s(t)}, \qquad 0 \le \xi \le 1, \qquad
 s(t) = s_0 + s_1 t, \qquad \dot s = s_1
-\]
- 
-\paragraph{Derivatives}
-\[
-\frac{\partial T}{\partial x} = \frac{1}{s}\,\frac{\partial T}{\partial \xi},
+\end{equation}
+
+Applying a change of variable to our equation~\eqref{eq:filament_pde} we get:
+
+\begin{equation*}
+\begin{aligned}
+\frac{\partial T}{\partial x} &= \frac{1}{s}\,\frac{\partial T}{\partial \xi},
 \qquad
-\frac{\partial^2 T}{\partial x^2} = \frac{1}{s^2}\,\frac{\partial^2 T}{\partial \xi^2}
-\]
-\[
+\frac{\partial^2 T}{\partial x^2} = \frac{1}{s^2}\,\frac{\partial^2 T}{\partial \xi^2} \\
 \left(\frac{\partial T}{\partial t}\right)_{\!x}
-= \frac{\partial T}{\partial \xi}\left(\frac{\partial \xi}{\partial t}\right)_{\!x} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
-= -\frac{x\,\dot s}{s^2}\,\frac{\partial T}{\partial \xi} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
-= -\frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
-\]
- 
-\paragraph{Transformed equation}
-\[
-\boxed{\;\left(\frac{\partial T}{\partial t}\right)_{\!\xi}
+&= \left(\frac{\partial T}{\partial t}\right)_{\!\xi} + \frac{\partial T}{\partial \xi}\left(\frac{\partial \xi}{\partial t}\right)_{\!x}
+= \left(\frac{\partial T}{\partial t}\right)_{\!\xi} - \frac{x\,\dot s}{s^2}\,\frac{\partial T}{\partial \xi}
+= \left(\frac{\partial T}{\partial t}\right)_{\!\xi} - \frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi}
+\end{aligned}
+\end{equation*}
+
+\begin{equation}
+\label{eq:filament_pde_fixed}
+\boxed{\left(\frac{\partial T}{\partial t}\right)_{\!\xi}
 = \frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi}
 + \frac{k}{s^2}\,\frac{\partial^2 T}{\partial \xi^2}
-+ \alpha\,T + \beta\;}
-\]
- 
-\subsubsection*{3. Boundary and Initial Conditions}
- 
-\[
-T(1, t) = T_n \quad \text{(nozzle temperature at } x = s(t)\text{)}
-\]
-\[
-\partial_x T(0, t) = 0
-\quad\Longrightarrow\quad
-\frac{T_1^j - T_0^j}{\Delta \xi} = 0
-\quad\Longrightarrow\quad
-T_0^j = T_1^j
-\]
-\[
-T_i^0 = T_n, \qquad s(0) = s_0 \ \text{(small)}
-\]
- 
-\subsubsection*{4. Discretisation (implicit)}
- 
-\[
-\xi_i = i\,\Delta\xi, \quad \Delta \xi = \tfrac{1}{N}, \quad i = 0,\dots,N;
-\qquad t_j = j\,\Delta t; \qquad T_i^j \approx T(\xi_i, t_j)
-\]
-\[
-\frac{\partial T}{\partial t} \approx \frac{T_i^j - T_i^{j-1}}{\Delta t},
++ \alpha\,T + \beta}
+\end{equation}
+
+\subsubsection*{Boundary and Initial Conditions}
+
+With $T(\xi, t)$ we can place necessary boundary conditions for the problem to be solvable. Firstly, the temperature at the endpoint $(\xi = 1)$ at all times equals the temperature of the nozzle which constitutes a Dirichlet condition. Secondly, we assume that the heat dissipation on the $(\xi = 0)$ surface is negligible compared to the whole surface, so a Neumann boundary condition is used to model it insulated. Finally, as seen in~\eqref{eq:front_fixing}, there exists initial length of filament $s_0$, needed to solve the problem, and its temperature at $t=0$ is assumed uniform and equal to the nozzle temperature.
+
+\begin{equation}
+\label{eq:filament_bc}
+T(1, t) = T_n, \qquad
+\partial_\xi T(0, t) = 0, \qquad
+T(\xi, 0) = T_n, \qquad
+s_0 > 0
+\end{equation}
+
+\subsubsection*{Discretisation }
+
+The temperature is discretised on a uniform grid in the transformed coordinate $\xi \in [0,1]$, with spacing $\Delta\xi = 1/N$, and in time with step $\Delta t$. Time is advanced with an implicit (backward) Euler scheme, the diffusion term $\partial_{\xi\xi}T$ uses a second-order central difference, which is symmetric and produces a tridiagonal matrix and the advection term $\partial_\xi T$ uses a first-order upwind difference.
+
+\begin{equation*}
+\xi_i = i\,\Delta\xi, \quad i = 0,\dots,N,
+\qquad t_j = j\,\Delta t, \qquad T_i^j \approx T(\xi_i, t_j)
+\end{equation*}
+
+\begin{equation}
+\label{eq:fd_approx}
+\left.\frac{\partial T}{\partial t}\right|_i^j \approx \frac{T_i^j - T_i^{j-1}}{\Delta t},
 \qquad
-\frac{\partial T}{\partial \xi} \approx \frac{T_{i+1}^j - T_i^j}{\Delta \xi},
+\left.\frac{\partial T}{\partial \xi}\right|_i^j \approx \frac{T_{i+1}^j - T_i^j}{\Delta \xi},
 \qquad
-\frac{\partial^2 T}{\partial \xi^2} \approx \frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
-\]
-\[
-\gamma_i = \frac{\xi_i\,\dot s\,\Delta t}{s\,\Delta \xi},
+\left.\frac{\partial^2 T}{\partial \xi^2}\right|_i^j \approx \frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
+\end{equation}
+
+\begin{equation}
+\label{eq:filament_discrete}
+\frac{T_i^j - T_i^{j-1}}{\Delta t}
+= \frac{\xi_i\,\dot s}{s}\,\frac{T_{i+1}^j - T_i^j}{\Delta \xi}
++ \frac{k}{s^2}\,\frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
++ \alpha\,T_i^j + \beta
+\end{equation}
+
+With some substitutions and after inserting the approximations into the transformed PDE gives we get:
+
+\begin{equation*}
+\gamma_i = \frac{\xi_i\,\dot s\,\Delta t}{s\,\Delta \xi} = \frac{i\,\dot s\,\Delta t}{s},
 \qquad
 g = \frac{k\,\Delta t}{s^2\,\Delta \xi^2},
 \qquad s,\ \dot s \ \text{evaluated at } t_j
-\]
-\[
-\boxed{\;T_i^j\big[\,1 + \gamma_i + 2g - \alpha\,\Delta t\,\big]
-= g\,T_{i-1}^j + (\gamma_i + g)\,T_{i+1}^j + T_i^{j-1} + \beta\,\Delta t\;}
-\]
+\end{equation*}
 
- \subsubsection*{Stability}
-\todo{von Neumann probably}
+\begin{equation}
+\label{eq:filament_scheme}
+\boxed{T_i^j\big[\,1 + \gamma_i + 2g - \alpha\,\Delta t\,\big]
+= g\,T_{i-1}^j + (\gamma_i + g)\,T_{i+1}^j + T_i^{j-1} + \beta\,\Delta t}
+\end{equation}
 
-\subsubsection*{5. Linear System at $t = t_j$}
+\begin{figure}[H]
+\centering
+% this was generated with the help of ai (tikz is hard)
+\begin{tikzpicture}[
+  n/.style={circle,draw=black!70,thick,minimum size=11mm,inner sep=0pt,font=\scriptsize,fill=white},
+  past/.style={n,fill=gray!12,draw=gray,text=black!65},
+  hl/.style={n,fill=yellow!60,draw=orange!80!black,very thick},
+  st/.style={n,fill=blue!18,draw=blue!70!black,very thick},
+  bnd/.style={n,fill=orange!35,draw=orange!70!black,very thick},
+  tim/.style={->,gray,dashed,thick}
+]
+
+\def\dx{2.3}
+\def\tj{4.0}
+
+\draw[gray!60] (0,0) -- (4*\dx,0);
+\draw[gray!60] (0,\tj) -- (4*\dx,\tj);
+
+\node[past] (P0) at (0,0)       {$T_0^{j-1}$};
+\node[past] (P1) at (\dx,0)     {$T_1^{j-1}$};
+\node[hl]   (P2) at (2*\dx,0)   {$T_2^{j-1}$};
+\node[past] (P3) at (3*\dx,0)   {$T_3^{j-1}$};
+\node[past] (P4) at (4*\dx,0)   {$T_4^{j-1}$};
+
+\node[bnd] (N0) at (0,\tj)       {$T_0^{j}$};
+\node[st]  (N1) at (\dx,\tj)     {$T_1^{j}$};
+\node[st]  (N2) at (2*\dx,\tj)   {$T_2^{j}$};
+\node[st]  (N3) at (3*\dx,\tj)   {$T_3^{j}$};
+\node[bnd] (N4) at (4*\dx,\tj)   {$T_4^{j}$};
+
+\draw[tim] (P0) -- (N0);
+\draw[tim] (P1) -- (N1);
+\draw[tim] (P2) -- (N2);
+\draw[tim] (P3) -- (N3);
+\draw[tim] (P4) -- (N4);
+\node[font=\footnotesize,gray] at (2*\dx+0.8,2.0) {$\Delta t$};
+
+\node[font=\footnotesize] at (0.5*\dx,\tj-0.6) {$T_0^j=T_1^j$};
+\node[font=\footnotesize] at (0,\tj+0.9) {Neumann at $\xi=0$};
+
+\node[font=\footnotesize,orange!60!black] at (4*\dx,\tj+0.9) {Dirichlet at $\xi=1$};
+\node[font=\footnotesize,orange!60!black] at (4*\dx,\tj-0.8) {$T_4^j=T_n$};
+
+\node[font=\footnotesize,blue!60!black] at (2*\dx,\tj+0.9) {implicit stencil at $t_j$};
+
+\node[font=\footnotesize,anchor=east] at (-0.7,\tj) {$t_j$ (unknown)};
+\node[font=\footnotesize,anchor=east] at (-0.7,0) {$t_{j-1}$ (known)};
+
+\draw[->] (-0.5,-1.4) -- (4*\dx+0.6,-1.4) node[right,font=\footnotesize] {$\xi$};
+\foreach \i in {0,...,4} {
+  \draw (\i*\dx,-1.4) -- (\i*\dx,-1.55);
+  \node[font=\footnotesize] at (\i*\dx,-1.85) {$\xi_{\i}=\tfrac{\i}{4}$};
+}
+
+\node[font=\footnotesize,anchor=west] at (-0.5,-2.6) {$x = s(t)\,\xi,\qquad 0\le x\le s(t)$};
+
+\node[past,minimum size=6mm] at (0,-3.3) {};
+\node[anchor=west,font=\footnotesize] at (0.45,-3.3) {known ($t_{j-1}$)};
+\node[hl,minimum size=6mm] at (4.0,-3.3) {};
+\node[anchor=west,font=\footnotesize] at (4.45,-3.3) {used in update};
+\node[st,minimum size=6mm] at (8.2,-3.3) {};
+\node[anchor=west,font=\footnotesize] at (8.65,-3.3) {unknown in stencil};
+
+\end{tikzpicture}
+\caption{Implicit stencil of~\eqref{eq:filament_scheme} on the transformed grid ($N = 4$).}
+\label{fig:implicit_stencil}
+\end{figure}
+
+We can see that we arrive at an implicit formulation (Figure~\ref{fig:implicit_stencil}), where we need to solve a linear system at each time step.
+
+\subsubsection*{Linear System at $t = t_j$}
+
+Writing down a couple of terms we can see that we get a tridiagonal matrix, with the first row representing the Neumann condition and the last the Dirichlet condition.  
  
-\[
-d_i = 1 + \gamma_i + 2g - \alpha\,\Delta t, \qquad e_i = \gamma_i + g
-\]
-\[
+\begin{equation*}
+d_i = 1 + \gamma_i + 2g - \alpha\,\Delta t, \qquad e_i = \gamma_i + g,
+\qquad
+T_0^j = T_1^j, \qquad T_N^j = T_n
+\end{equation*}
+
+\begin{equation}
+\label{eq:filament_linear_system}
 \begin{bmatrix}
 1 & -1 & & & & \\
 -g & d_1 & -e_1 & & & \\
  & -g & d_2 & -e_2 & & \\
  & & \ddots & \ddots & \ddots & \\
  & & & -g & d_{N-1} & -e_{N-1} \\
- & & & & 0 & 1
+ & & & & & 1
 \end{bmatrix}
 \begin{bmatrix}
 T_0^j \\ T_1^j \\ T_2^j \\ \vdots \\ T_{N-1}^j \\ T_N^j
@@ -756,19 +853,23 @@ T_0^j \\ T_1^j \\ T_2^j \\ \vdots \\ T_{N-1}^j \\ T_N^j
 \begin{bmatrix}
 0 \\ T_1^{j-1} + \beta\,\Delta t \\ T_2^{j-1} + \beta\,\Delta t \\ \vdots \\ T_{N-1}^{j-1} + \beta\,\Delta t \\ T_n
 \end{bmatrix}
-\]
+\end{equation}
+
+The fact that the matrix is tridiagonal allows us to use specialised solvers like \textit{scipy.\allowbreak linalg.\allowbreak solve\_banded}.
  
-%--------------------------------------------------------------
-\subsubsection*{6. After the Boundary Stops (Closed Ring)}
+
+\subsubsection*{After the Boundary Stops (Closed Ring)}
+After the boundary stops moving, i.e. the circle is closed the matrix needs to be slightly modified, which causes it to lose its tridiagonal form. At the time point of contact the first and last node are connected and become one node, and its temperature is set to the mean of both of them. As the boundary stops moving $\dot{s}$ and consequently $\gamma_i$ terms disappear.
  
-\[
+\begin{equation*}
 \dot s = 0 \;\Rightarrow\; \gamma_i = 0, \qquad s = L, \qquad
-T_N^j \equiv T_0^j \ \text{(first and last node coincide)}
-\]
-\[
+T_N^j \equiv T_0^j, \qquad
+g = \frac{k\,\Delta t}{L^2\,\Delta \xi^2}, \qquad
 d = 1 + 2g - \alpha\,\Delta t
-\]
-\[
+\end{equation*}
+
+\begin{equation}
+\label{eq:filament_ring_system}
 \begin{bmatrix}
 d & -g & & & -g \\
 -g & d & -g & & \\
@@ -783,18 +884,63 @@ T_0^j \\ T_1^j \\ \vdots \\ T_{N-2}^j \\ T_{N-1}^j
 \begin{bmatrix}
 T_0^{j-1} + \beta\,\Delta t \\ T_1^{j-1} + \beta\,\Delta t \\ \vdots \\ T_{N-2}^{j-1} + \beta\,\Delta t \\ T_{N-1}^{j-1} + \beta\,\Delta t
 \end{bmatrix}
-\]
+\end{equation}
 First step after connection:
-\[
+\begin{equation*}
 T_0^{j-1} \leftarrow \tfrac{1}{2}\big(T_0^{j-1} + T_N^{j-1}\big)
-\]
+\end{equation*}
 
-\todo{Choose and display the chosen model parameters}
+\subsubsection*{Simulation}
+
+The derived model was simulated in \textit{Python} with the parameters listed below.
+
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\textwidth]{initial_pde_plot.png}
-  \caption{INITIAL PLOT, CHANGE.}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{filament_T_x.pdf}
+    \caption{Physical space $x$.}
+    \label{fig:filament_T_x}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{filament_T_xi.pdf}
+    \caption{Transformed space $\xi$.}
+    \label{fig:filament_T_xi}
+  \end{subfigure}
+  \caption{Temperature of the filament while printing and after the ring is closed.}
   \label{fig:pde_plot}
 \end{figure}
 
+
+\begin{table}[H]
+  \centering
+  \caption{Parameters of the filament cooling simulation.}
+  \label{tab:filament_params}
+  \begin{tabular}{llr}
+    \toprule
+    Description & Symbol & Value \\
+    \midrule
+    Density                           & $\rho$          & \qty{1240}{\kilogram\per\cubic\metre} \\
+    Specific heat                     & $c$             & \qty{1800}{\joule\per\kilogram\per\kelvin} \\
+    Thermal conductivity              & $\kappa$        & \qty{0.13}{\watt\per\metre\per\kelvin} \\
+    Cross-section side                & $a$             & \qty{2}{\milli\metre} \\
+    \midrule
+    Heat transfer coefficient, environment & $K_e$      & \qty{10}{\watt\per\square\metre\per\kelvin} \\
+    Heat transfer coefficient, heating plate & $K_p$    & \qty{200}{\watt\per\square\metre\per\kelvin} \\
+    Environmental temperature         & $T_e$           & \qty{26.85}{\degreeCelsius} \\
+    Heating plate temperature         & $T_p$           & \qty{60}{\degreeCelsius} \\
+    \midrule
+    Initial filament length           & $s_0$           & \qty{1}{\milli\metre} \\
+    Nozzle speed                      & $s_1$           & \qty{1}{\milli\metre\per\second} \\
+    Ring length                       & $L$             & \qty{100}{\milli\metre} \\
+    Nozzle temperature                & $T_n$           & \qty{240}{\degreeCelsius} \\
+    \midrule
+    Number of intervals               & $N$             & 200 \\
+    Time step                         & $\Delta t$      & \qty{0.05}{\second} \\
+    Simulated time after closing      & --              & \qty{120}{\second} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
