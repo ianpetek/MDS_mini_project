@@ -6,22 +6,18 @@ The first task is to derive the direct kinematics of the Core XY mechanism. This
 
 \begin{equation}
 \label{eq:belt_kinematics}
-\begin{aligned}
-\Delta L &= \Delta x + \Delta y \\
-\Delta R &= \Delta x - \Delta y \\
-\Delta x &= \frac{\Delta L + \Delta R}{2} \\
-\Delta y &= \frac{\Delta L - \Delta R}{2}
-\end{aligned}
+\Delta L = \Delta x + \Delta y, \qquad
+\Delta R = \Delta x - \Delta y, \qquad
+\Delta x = \frac{\Delta L + \Delta R}{2}, \qquad
+\Delta y = \frac{\Delta L - \Delta R}{2}
 \end{equation}
 
 With $\Delta L$ and $\Delta R$ being the length of belt moved by the motors, and $\Delta x$ and $\Delta y$ being the change in position of the tool head.
 
 \begin{equation}
 \label{eq:belt_motor}
-\begin{aligned}
-\Delta L &= r_m \, \theta_L \\
-\Delta R &= r_m \, \theta_R
-\end{aligned}
+\Delta L = r_m \, \theta_L, \qquad
+\Delta R = r_m \, \theta_R
 \end{equation}
 
 If we assume that in the beginning the motors are at
@@ -31,20 +27,16 @@ $\theta_L = \theta_R = 0$ and the tool head is at $(0, 0)$, we get the following
 
 \begin{equation}
 \label{eq:kinematics}
-\begin{aligned}
-x(\theta_L, \theta_R) &= \frac{r_m \theta_L + r_m \theta_R}{2}
-  = \frac{r_m}{2} \left( \theta_L + \theta_R \right) \\
-y(\theta_L, \theta_R) &= \frac{r_m \theta_L - r_m \theta_R}{2}
+x(\theta_L, \theta_R) = \frac{r_m \theta_L + r_m \theta_R}{2}
+  = \frac{r_m}{2} \left( \theta_L + \theta_R \right), \qquad
+y(\theta_L, \theta_R) = \frac{r_m \theta_L - r_m \theta_R}{2}
   = \frac{r_m}{2} \left( \theta_L - \theta_R \right)
-\end{aligned}
 \end{equation}
 
 \begin{equation}
 \label{eq:kinematics_vel}
-\begin{aligned}
-\dot{x}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L + \dot{\theta}_R \right) \\
-\dot{y}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L - \dot{\theta}_R \right)
-\end{aligned}
+\dot{x}(\dot{\theta}_L, \dot{\theta}_R) = \frac{r_m}{2} \left( \dot{\theta}_L + \dot{\theta}_R \right), \qquad
+\dot{y}(\dot{\theta}_L, \dot{\theta}_R) = \frac{r_m}{2} \left( \dot{\theta}_L - \dot{\theta}_R \right)
 \end{equation}
 
 \subsection{Dynamics}
@@ -107,12 +99,10 @@ For the two carriage bearings, if we assume the belt to be horizontal on the car
 With that we get two more terms:
 
 \begin{equation*}
-\begin{aligned}
-D_{L2} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L2}^2\,\mu_r 
-    = \mu_r \frac{1}{r_b^2}\dot x^2 \\
-D_{R2} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R2}^2\,\mu_r 
+D_{L2} = 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L2}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\dot x^2, \qquad
+D_{R2} = 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R2}^2\,\mu_r 
     = \mu_r \frac{1}{r_b^2}\dot x^2
-\end{aligned}
 \end{equation*}
 
 Then simply combining them:
@@ -133,17 +123,8 @@ D_{\mathrm{mech}} = \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,x}\right]\dot x^2
     + \left[2\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
 \end{equation}
 
-\clearpage
-
 \subsubsection{Electrical Part}
-Now we model the energies of the electrical part of the system. Keep in mind that both motors are the same. Below we can see the equivalent circuit of a DC motor:
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{motor_sch.png}
-  \caption{Equivalent circuit of a DC motor.}
-  \label{fig:motor_circuit}
-\end{figure}
+Now we model the energies of the electrical part of the system. Keep in mind that both motors are the same.
 
 \subsubsection*{Kinetic Energy}
 The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly to \eqref{eq:inverse_kinematics}, using the motor shaft radius:
@@ -168,11 +149,9 @@ As there are no capacitors in the system, there is no potential energy change as
 The only dissipative term in the electrical part of the system is the resistor:
 
 \begin{equation}
-  \begin{gathered}
     D_{\mathrm{el},L} = \tfrac{1}{2} i_L^2 R_m, \qquad 
-    D_{\mathrm{el},R} = \tfrac{1}{2} i_R^2 R_m \\
+    D_{\mathrm{el},R} = \tfrac{1}{2} i_R^2 R_m, \qquad
     D_{\mathrm{el}} = \tfrac{1}{2} R_m \left(i_L^2 + i_R^2\right)
-  \end{gathered}
 \end{equation}
 
 \subsubsection*{Matrix Equations}
@@ -189,20 +168,18 @@ D = \tfrac{1}{2}\,\dot q^\top \mathbf{N}\,\dot q
 With corresponding matrices:
 
 \begin{equation}
-\begin{aligned}
-\mathbf{M} &= \begin{bmatrix}
+\mathbf{M} = \begin{bmatrix}
 m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 0 & m + J_m \dfrac{2}{r_m^2} & 0 & 0 \\
 0 & 0 & L_m & 0 \\
 0 & 0 & 0 & L_m
-\end{bmatrix} \\
-\mathbf{N} &= \begin{bmatrix}
+\end{bmatrix}, \qquad
+\mathbf{N} = \begin{bmatrix}
 8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,x} & 0 & 0 & 0 \\
 0 & 4\dfrac{\mu_r}{r_b^2} + 2\mu_{l,y} & 0 & 0 \\
 0 & 0 & R_m & 0 \\
 0 & 0 & 0 & R_m
 \end{bmatrix}
-\end{aligned}
 \end{equation}
 
 
@@ -249,11 +226,9 @@ Using the fact that this is a linear system and there are no potential energies 
 \end{equation*}
 
 \begin{equation*}
-\begin{aligned}
-\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} &= \frac{d}{dt}\left(\mathbf{M}\dot q\right) = \mathbf{M}\ddot q \\
-\frac{\partial \mathcal{L}}{\partial q} &= 0 \\
-\frac{\partial D}{\partial \dot q} &= \mathbf{N}\dot q
-\end{aligned}
+\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} = \frac{d}{dt}\left(\mathbf{M}\dot q\right) = \mathbf{M}\ddot q, \qquad
+\frac{\partial \mathcal{L}}{\partial q} = 0, \qquad
+\frac{\partial D}{\partial \dot q} = \mathbf{N}\dot q
 \end{equation*}
 
 And finally solving the Euler--Lagrange equation:
@@ -345,10 +320,8 @@ To decouple the system, we introduce a set of useful substitutions:
 \label{eq:decoupling_subs}
 \boxed{
 \begin{aligned}
-i_x &= i_L + i_R, & u_{m,x} &= u_{m,L} + u_{m,R} \\
-i_y &= i_L - i_R, & u_{m,y} &= u_{m,L} - u_{m,R} \\
-i_L &= \frac{i_x + i_y}{2}, & u_{m,L} &= \frac{u_{m,x} + u_{m,y}}{2} \\
-i_R &= \frac{i_x - i_y}{2}, & u_{m,R} &= \frac{u_{m,x} - u_{m,y}}{2}
+i_x &= i_L + i_R, & i_y &= i_L - i_R, & u_{m,x} &= u_{m,L} + u_{m,R}, & u_{m,y} &= u_{m,L} - u_{m,R} \\
+i_L &= \frac{i_x + i_y}{2}, & i_R &= \frac{i_x - i_y}{2}, & u_{m,L} &= \frac{u_{m,x} + u_{m,y}}{2}, & u_{m,R} &= \frac{u_{m,x} - u_{m,y}}{2}
 \end{aligned}}
 \end{equation}
 
@@ -369,20 +342,16 @@ Then by adding and subtracting the two equations to cancel terms we get:
 
 \begin{equation}
 \label{eq:decoupled_currents}
-\begin{aligned}
-\frac{di_x}{dt} &= -\frac{2K_m}{r_m L_m}\dot x - \frac{R_m}{L_m} i_x + \frac{1}{L_m} u_{m,x} \\
-\frac{di_y}{dt} &= -\frac{2K_m}{r_m L_m}\dot y - \frac{R_m}{L_m} i_y + \frac{1}{L_m} u_{m,y}
-\end{aligned}
+\frac{di_x}{dt} = -\frac{2K_m}{r_m L_m}\dot x - \frac{R_m}{L_m} i_x + \frac{1}{L_m} u_{m,x}, \qquad
+\frac{di_y}{dt} = -\frac{2K_m}{r_m L_m}\dot y - \frac{R_m}{L_m} i_y + \frac{1}{L_m} u_{m,y}
 \end{equation}
 
 And by substituting \eqref{eq:decoupling_subs} into the first two equations of \eqref{eq:state_equations}:
 
 \begin{equation}
 \label{eq:decoupled_motion}
-\begin{aligned}
-\ddot x &= -\frac{b_x}{m_{\mathrm{eq}}}\dot x + \frac{K_m}{m_{\mathrm{eq}} r_m} i_x \\
-\ddot y &= -\frac{b_y}{m_{\mathrm{eq}}}\dot y + \frac{K_m}{m_{\mathrm{eq}} r_m} i_y
-\end{aligned}
+\ddot x = -\frac{b_x}{m_{\mathrm{eq}}}\dot x + \frac{K_m}{m_{\mathrm{eq}} r_m} i_x, \qquad
+\ddot y = -\frac{b_y}{m_{\mathrm{eq}}}\dot y + \frac{K_m}{m_{\mathrm{eq}} r_m} i_y
 \end{equation}
 
 And finally:
@@ -425,10 +394,8 @@ Rearranging the decoupled equations of motion \eqref{eq:decoupled_motion}, we ca
 \begin{equation}
 \label{eq:inverse_currents}
 \boxed{
-\begin{aligned}
-i_x &= \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x \\
-i_y &= \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y
-\end{aligned}}
+i_x = \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x, \qquad
+i_y = \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y}
 \end{equation}
 
 The motor equations for each motor are:
@@ -453,10 +420,8 @@ and similarly by subtracting them, we get the decoupled input voltages, consiste
 \begin{equation}
 \label{eq:inverse_voltages}
 \boxed{
-\begin{aligned}
-u_{m,x} &= L_m \frac{di_x}{dt} + R_m i_x + \frac{2K_m}{r_m}\,\dot x \\
-u_{m,y} &= L_m \frac{di_y}{dt} + R_m i_y + \frac{2K_m}{r_m}\,\dot y
-\end{aligned}}
+u_{m,x} = L_m \frac{di_x}{dt} + R_m i_x + \frac{2K_m}{r_m}\,\dot x, \qquad
+u_{m,y} = L_m \frac{di_y}{dt} + R_m i_y + \frac{2K_m}{r_m}\,\dot y}
 \end{equation}
 
 The original motor voltages then follow from \eqref{eq:decoupling_subs}:
@@ -483,10 +448,8 @@ y(t) = k + b\sin t
 We also need the derivatives up to the third order:
 
 \begin{equation*}
-\begin{aligned}
-\dot x &= -a\sin t, & \ddot x &= -a\cos t, & \dddot x &= a\sin t \\
-\dot y &= b\cos t,  & \ddot y &= -b\sin t, & \dddot y &= -b\cos t
-\end{aligned}
+\dot x = -a\sin t, \quad \ddot x = -a\cos t, \quad \dddot x = a\sin t, \qquad
+\dot y = b\cos t, \quad \ddot y = -b\sin t, \quad \dddot y = -b\cos t
 \end{equation*}
 
 Substituting into \eqref{eq:inverse_currents}:
@@ -541,15 +504,6 @@ Simulating the given system with parameters defined in Table~\ref{tab:symbols}, 
   \label{fig:elipse}
 \end{figure}
 
-As this is open-loop control, this good result relies on a good parameter estimation. If we change the parameters of the model by $\pm 5\%$ we can see that an error immediately arises.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics{elipse_simulated_perturbed.pdf}
-  \caption{Open-loop drawing of an ellipse with model parameters perturbed by $\pm 5\%$.}
-  \label{fig:elipse_perturbed}
-\end{figure}
-
 \subsubsection*{Arbitrary Drawing}
 
 As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with quartic splines. Using MATLAB's \textit{bwboundaries} function to detect edges of shapes, in combination with \textit{spapi} which gives us an interpolating quartic spline given a set of points, we can draw the \textit{TU Delft} logo\footnote{Different letter boundaries are connected by straight lines so the whole drawing can be one input function}.
@@ -573,43 +527,24 @@ As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will 
   \label{fig:tu_delft}
 \end{figure}
 
-Again, like with the ellipse, the logo, because of its sharp corners, is even more sensitive to inaccuracies in the model parameters. If we again perturb the parameters by $\pm 5\%$ we see that control of this form would not be useful anymore.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics{tu_delft_perturbed.pdf}
-  \caption{Open-loop drawing of the \textit{TU Delft} logo with model parameters perturbed by $\pm 5\%$.}
-  \label{fig:tu_delft_perturbed}
-\end{figure}
-
 
 \subsubsection{Modelling the Nozzle}
-In the following section we model the nozzle of the 3D printer (Figure~\ref{fig:nozzle}). 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.3\textwidth]{nozzle_sch.png}
-  \caption{Schematic of the nozzle heating circuit.}
-  \label{fig:nozzle}
-\end{figure}
+In the following section we model the nozzle of the 3D printer.
 
 The system consists of an electrical and thermodynamical part. A circuit consisting of an inductor $L_n$, capacitor $C_n$ and a heating resistor $R_n$. We choose the current through the inductor and the voltage across the capacitor, $i_{L,n}$ and $u_c$ respectively, as first two states of our system. By solving the three Kirchhoff equations we get the following two first-order differential equations:
 
 \begin{equation}
   \label{eq:noz_el}
-  \begin{aligned}
-    L_n\,\frac{di_{L,n}}{dt} &= u_n - u_c \\
-    C_n\,\frac{du_c}{dt} &= i_{L,n} - \frac{u_c}{R_n(T_r)}
-  \end{aligned}
+    L_n\,\frac{di_{L,n}}{dt} = u_n - u_c, \qquad
+    C_n\,\frac{du_c}{dt} = i_{L,n} - \frac{u_c}{R_n(T_r)}
 \end{equation}
 
 Next, we model the thermal part. Besides the thermal capacitance of the nozzle $C_{t,n}$, given in the task, we also model the thermal capacitance of the resistor $C_r$\footnote{If we do not model the thermal capacitance of the resistor, we end up with a differential-algebraic equation (DAE).}. We choose two additional states, temperature of the resistor ($T_r$) and the temperature of the nozzle ($T_n$). Losses happening between the resistor and the nozzle are described by $R_{t,n}$, and the heat dissipation to the environment and to the filament is modelled with one variable $R_{\mathrm{env}}$. The connection to the electrical part is the heat dissipated by the resistor $P_r = \frac{u_c^2}{R_n(T_r)}$. This gives us the following two equations which with \eqref{eq:noz_el} fully describe the system:
 
 \begin{equation}
   \label{eq:noz_th}
-  \begin{aligned}
-    C_{t,n}\,\frac{dT_n}{dt} &= \frac{T_r - T_n}{R_{t,n}} - \frac{T_n - T_e}{R_{\mathrm{env}}} \\
-    C_r\,\frac{dT_r}{dt} &= P_r - \frac{T_r - T_n}{R_{t,n}}
-  \end{aligned}
+    C_{t,n}\,\frac{dT_n}{dt} = \frac{T_r - T_n}{R_{t,n}} - \frac{T_n - T_e}{R_{\mathrm{env}}}, \qquad
+    C_r\,\frac{dT_r}{dt} = P_r - \frac{T_r - T_n}{R_{t,n}}
 \end{equation}
 
 with
@@ -621,8 +556,6 @@ where $R_0$ is the resistance at the reference temperature $T_0$ and $\alpha$ is
 
 Due to the square voltage term and the temperature dependence of the resistance the system is very non-linear, although the very different time constants of two systems (thermal states change much slower compared to the electrical) can be exploited. Alternatively, the model can reasonably be simplified by assuming a constant resistance. With that formulation we would get two linear systems connected by a single non-linear term.
 
-\clearpage
-
 \subsubsection{Printing a circle of filament}
 
 In this section a 1D distributed parameter model for the cooling of a square cross-section filament on a heating plate and a numerical formulation of the problem are derived.
@@ -630,16 +563,14 @@ In this section a 1D distributed parameter model for the cooling of a square cro
 \subsubsection*{Modelling the system}
 We take a cross-section of $a \times a$ with length $\Delta L$. Temperature is assumed uniform across the $a \times a$ cross-section to keep the model one dimensional in space. Three faces exchange heat with the environment ($T_e$), and one face with the heating plate ($T_p$).
 
-The problem is modelled using the heat equation~\cite{vandenboom2026modeling}, Fourier's law gives the flux~\eqref{eq:fourier}. Writing the energy density as~\eqref{eq:energy_density} and substituting both into the energy balance yields the heat equation~\eqref{eq:heat_equation}:
+The problem is modelled using the heat equation~\cite{vandenboom2026modeling}, Fourier's law gives the flux~\eqref{eq:heat_laws}. Writing the energy density as~\eqref{eq:heat_laws} and substituting both into the energy balance yields the heat equation~\eqref{eq:heat_equation}:
 
-\begin{align}
-\partial_t u &= -\nabla\cdot\phi + f
-  \label{eq:energy_balance} \\
-u &= \rho c\,T
-  \label{eq:energy_density} \\
-\phi &= -\kappa \nabla T
-  \label{eq:fourier}
-\end{align}
+\begin{equation}
+\label{eq:heat_laws}
+\partial_t u = -\nabla\cdot\phi + f, \qquad
+u = \rho c\,T, \qquad
+\phi = -\kappa \nabla T
+\end{equation}
 
 \begin{equation}
 \label{eq:heat_equation}
@@ -756,75 +687,7 @@ g = \frac{k\,\Delta t}{s^2\,\Delta \xi^2},
 = g\,T_{i-1}^j + (\gamma_i + g)\,T_{i+1}^j + T_i^{j-1} + \beta\,\Delta t}
 \end{equation}
 
-\begin{figure}[H]
-\centering
-% this was generated with the help of ai (tikz is hard)
-\begin{tikzpicture}[
-  n/.style={circle,draw=black!70,thick,minimum size=11mm,inner sep=0pt,font=\scriptsize,fill=white},
-  past/.style={n,fill=gray!12,draw=gray,text=black!65},
-  hl/.style={n,fill=yellow!60,draw=orange!80!black,very thick},
-  st/.style={n,fill=blue!18,draw=blue!70!black,very thick},
-  bnd/.style={n,fill=orange!35,draw=orange!70!black,very thick},
-  tim/.style={->,gray,dashed,thick}
-]
-
-\def\dx{2.3}
-\def\tj{4.0}
-
-\draw[gray!60] (0,0) -- (4*\dx,0);
-\draw[gray!60] (0,\tj) -- (4*\dx,\tj);
-
-\node[past] (P0) at (0,0)       {$T_0^{j-1}$};
-\node[past] (P1) at (\dx,0)     {$T_1^{j-1}$};
-\node[hl]   (P2) at (2*\dx,0)   {$T_2^{j-1}$};
-\node[past] (P3) at (3*\dx,0)   {$T_3^{j-1}$};
-\node[past] (P4) at (4*\dx,0)   {$T_4^{j-1}$};
-
-\node[bnd] (N0) at (0,\tj)       {$T_0^{j}$};
-\node[st]  (N1) at (\dx,\tj)     {$T_1^{j}$};
-\node[st]  (N2) at (2*\dx,\tj)   {$T_2^{j}$};
-\node[st]  (N3) at (3*\dx,\tj)   {$T_3^{j}$};
-\node[bnd] (N4) at (4*\dx,\tj)   {$T_4^{j}$};
-
-\draw[tim] (P0) -- (N0);
-\draw[tim] (P1) -- (N1);
-\draw[tim] (P2) -- (N2);
-\draw[tim] (P3) -- (N3);
-\draw[tim] (P4) -- (N4);
-\node[font=\footnotesize,gray] at (2*\dx+0.8,2.0) {$\Delta t$};
-
-\node[font=\footnotesize] at (0.5*\dx,\tj-0.6) {$T_0^j=T_1^j$};
-\node[font=\footnotesize] at (0,\tj+0.9) {Neumann at $\xi=0$};
-
-\node[font=\footnotesize,orange!60!black] at (4*\dx,\tj+0.9) {Dirichlet at $\xi=1$};
-\node[font=\footnotesize,orange!60!black] at (4*\dx,\tj-0.8) {$T_4^j=T_n$};
-
-\node[font=\footnotesize,blue!60!black] at (2*\dx,\tj+0.9) {implicit stencil at $t_j$};
-
-\node[font=\footnotesize,anchor=east] at (-0.7,\tj) {$t_j$ (unknown)};
-\node[font=\footnotesize,anchor=east] at (-0.7,0) {$t_{j-1}$ (known)};
-
-\draw[->] (-0.5,-1.4) -- (4*\dx+0.6,-1.4) node[right,font=\footnotesize] {$\xi$};
-\foreach \i in {0,...,4} {
-  \draw (\i*\dx,-1.4) -- (\i*\dx,-1.55);
-  \node[font=\footnotesize] at (\i*\dx,-1.85) {$\xi_{\i}=\tfrac{\i}{4}$};
-}
-
-\node[font=\footnotesize,anchor=west] at (-0.5,-2.6) {$x = s(t)\,\xi,\qquad 0\le x\le s(t)$};
-
-\node[past,minimum size=6mm] at (0,-3.3) {};
-\node[anchor=west,font=\footnotesize] at (0.45,-3.3) {known ($t_{j-1}$)};
-\node[hl,minimum size=6mm] at (4.0,-3.3) {};
-\node[anchor=west,font=\footnotesize] at (4.45,-3.3) {used in update};
-\node[st,minimum size=6mm] at (8.2,-3.3) {};
-\node[anchor=west,font=\footnotesize] at (8.65,-3.3) {unknown in stencil};
-
-\end{tikzpicture}
-\caption{Implicit stencil of~\eqref{eq:filament_scheme} on the transformed grid ($N = 4$).}
-\label{fig:implicit_stencil}
-\end{figure}
-
-We can see that we arrive at an implicit formulation (Figure~\ref{fig:implicit_stencil}), where we need to solve a linear system at each time step.
+We can see that we arrive at an implicit formulation, where we need to solve a linear system at each time step.
 
 \subsubsection*{Linear System at $t = t_j$}
 
@@ -892,7 +755,7 @@ T_0^{j-1} \leftarrow \tfrac{1}{2}\big(T_0^{j-1} + T_N^{j-1}\big)
 
 \subsubsection*{Simulation}
 
-The derived model was simulated in \textit{Python} with the parameters listed below.
+The derived model was simulated in \textit{Python} with the parameters listed in Table~\ref{tab:filament_params} (Appendix~\ref{app:filament_params}).
 
 
 \begin{figure}[H]
@@ -913,34 +776,3 @@ The derived model was simulated in \textit{Python} with the parameters listed be
   \caption{Temperature of the filament while printing and after the ring is closed.}
   \label{fig:pde_plot}
 \end{figure}
-
-
-\begin{table}[H]
-  \centering
-  \caption{Parameters of the filament cooling simulation.}
-  \label{tab:filament_params}
-  \begin{tabular}{llr}
-    \toprule
-    Description & Symbol & Value \\
-    \midrule
-    Density                           & $\rho$          & \qty{1240}{\kilogram\per\cubic\metre} \\
-    Specific heat                     & $c$             & \qty{1800}{\joule\per\kilogram\per\kelvin} \\
-    Thermal conductivity              & $\kappa$        & \qty{0.13}{\watt\per\metre\per\kelvin} \\
-    Cross-section side                & $a$             & \qty{2}{\milli\metre} \\
-    \midrule
-    Heat transfer coefficient, environment & $K_e$      & \qty{10}{\watt\per\square\metre\per\kelvin} \\
-    Heat transfer coefficient, heating plate & $K_p$    & \qty{200}{\watt\per\square\metre\per\kelvin} \\
-    Environmental temperature         & $T_e$           & \qty{26.85}{\degreeCelsius} \\
-    Heating plate temperature         & $T_p$           & \qty{60}{\degreeCelsius} \\
-    \midrule
-    Initial filament length           & $s_0$           & \qty{1}{\milli\metre} \\
-    Nozzle speed                      & $s_1$           & \qty{1}{\milli\metre\per\second} \\
-    Ring length                       & $L$             & \qty{100}{\milli\metre} \\
-    Nozzle temperature                & $T_n$           & \qty{240}{\degreeCelsius} \\
-    \midrule
-    Number of intervals               & $N$             & 200 \\
-    Time step                         & $\Delta t$      & \qty{0.05}{\second} \\
-    Simulated time after closing      & --              & \qty{120}{\second} \\
-    \bottomrule
-  \end{tabular}
-\end{table}

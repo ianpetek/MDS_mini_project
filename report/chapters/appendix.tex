@@ -1,0 +1,32 @@
+\section{Filament Simulation Parameters}
+\label{app:filament_params}
+
+\begin{table}[H]
+  \centering
+  \caption{Parameters of the filament cooling simulation.}
+  \label{tab:filament_params}
+  \begin{tabular}{llr}
+    \toprule
+    Description & Symbol & Value \\
+    \midrule
+    Density                           & $\rho$          & \qty{1240}{\kilogram\per\cubic\metre} \\
+    Specific heat                     & $c$             & \qty{1800}{\joule\per\kilogram\per\kelvin} \\
+    Thermal conductivity              & $\kappa$        & \qty{0.13}{\watt\per\metre\per\kelvin} \\
+    Cross-section side                & $a$             & \qty{2}{\milli\metre} \\
+    \midrule
+    Heat transfer coefficient, environment & $K_e$      & \qty{10}{\watt\per\square\metre\per\kelvin} \\
+    Heat transfer coefficient, heating plate & $K_p$    & \qty{200}{\watt\per\square\metre\per\kelvin} \\
+    Environmental temperature         & $T_e$           & \qty{26.85}{\degreeCelsius} \\
+    Heating plate temperature         & $T_p$           & \qty{60}{\degreeCelsius} \\
+    \midrule
+    Initial filament length           & $s_0$           & \qty{1}{\milli\metre} \\
+    Nozzle speed                      & $s_1$           & \qty{1}{\milli\metre\per\second} \\
+    Ring length                       & $L$             & \qty{100}{\milli\metre} \\
+    Nozzle temperature                & $T_n$           & \qty{240}{\degreeCelsius} \\
+    \midrule
+    Number of intervals               & $N$             & 200 \\
+    Time step                         & $\Delta t$      & \qty{0.05}{\second} \\
+    Simulated time after closing      & --              & \qty{120}{\second} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
