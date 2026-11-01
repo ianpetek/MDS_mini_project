@@ -124,7 +124,6 @@ The edges IN\_PROGRESS $\to$ PAUSED in $\mathcal{P}$ and IDLE $\to$ MOVING\_TO\_
 \end{align*}
 Every edge also resets $\tau^{+} = 0$ (not repeated in the tables), and any variable not listed keeps its value, $z^{+} = z$.
 
-\newpage
 
 \subsection{Part 2: The Machines}
 \label{sec:q3_part2}
@@ -135,7 +134,7 @@ Each machine is shown as a flowchart that gives its modes, the inputs $u$ used i
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{figures/q31/clean/nozzle.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/q31/clean/nozzle.pdf}
     \caption{Nozzle machine, in the notation of this report. The dashed modes are failure modes of the implementation, which are not part of $H$. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
     \label{fig:q31_clean_nozzle}
 \end{figure}
@@ -150,7 +149,7 @@ Each machine is shown as a flowchart that gives its modes, the inputs $u$ used i
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/q31/clean/printer.pdf}
+    \includegraphics[width=0.85\textwidth]{figures/q31/clean/printer.pdf}
     \caption{Printer machine, in the notation of this report. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
     \label{fig:q31_clean_printer}
 \end{figure}
@@ -167,7 +166,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/q31/clean/filament.pdf}
+    \includegraphics[width=0.75\textwidth]{figures/q31/clean/filament.pdf}
     \caption{Filament machine, in the notation of this report. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
     \label{fig:q31_clean_filament}
 \end{figure}
@@ -205,7 +204,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 \begin{multicols}{2}
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/1_head_path.pdf}
+    \includegraphics[width=0.65\linewidth]{figures/q31/final_test/1_head_path.pdf}
     \captionof{figure}{Head path: first spool (red), unwanted colour (orange), after the colour change (green) and travel moves.}
     \label{fig:q31_final_path}
 \end{minipage}
@@ -213,7 +212,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/2_nozzle_temperature.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/2_nozzle_temperature.pdf}
     \captionof{figure}{Nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
     \label{fig:q31_final_temp}
 \end{minipage}
@@ -221,7 +220,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/3_nozzle_mode.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/3_nozzle_mode.pdf}
     \captionof{figure}{Nozzle machine mode.}
     \label{fig:q31_final_nozzle}
 \end{minipage}
@@ -229,7 +228,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/4_printer_mode.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/4_printer_mode.pdf}
     \captionof{figure}{Printer machine mode.}
     \label{fig:q31_final_printer}
 \end{minipage}
@@ -237,7 +236,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/5_filament_mode.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/5_filament_mode.pdf}
     \captionof{figure}{Filament machine mode.}
     \label{fig:q31_final_filament}
 \end{minipage}
@@ -245,7 +244,7 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/6_filament_extruded.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/6_filament_extruded.pdf}
     \captionof{figure}{Extruded filament length $L$ against $L_{spool}$.}
     \label{fig:q31_final_extruded}
 \end{minipage}
