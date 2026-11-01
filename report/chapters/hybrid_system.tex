@@ -194,119 +194,60 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 % \todo[inline]{Q3.2: the position is computed from the motor angle sensors only; describe how, and add the rotated square (bonus).}
 
-\paragraph{Cases.} The same square is drawn twice with a filament change in the middle of the print:
-\begin{enumerate}[nosep]
-    \item $C$ is triggered half-way through the print;
-    \item $F$ happens: the spool is empty half-way through the print.
-\end{enumerate}
-In both cases the head is moved to the wipe location $(0, 0.5)$\,m, and the part printed before the change is shown in red and the part after it in green.
-
-\subsubsection{Case 1: $C$ Triggered}
-\label{sec:q31_case1}
-$C$ is pressed at $t\approx\SI{69.6}{s}$, half-way through the print (after two sides of the square). The printer pauses, the head wipes at $(0,\,0.5)$\,m, the filament is loaded and the nozzle reheats, and printing resumes at $t\approx\SI{96.0}{s}$ (red to green). The square is complete at $t\approx\SI{163}{s}$.
+\paragraph{Test case.} A single print covers both a filament run-out $F$ and a colour change $C$. In every filament change the head moves to the wipe location $(0, 0.5)$\,m.
+\begin{itemize}[nosep]
+    \item Printing starts at $t\approx\SI{1}{s}$ with the first spool (red).
+    \item The spool runs out ($F$) at $t\approx\SI{75.0}{s}$. The printer pauses, the filament is changed, and printing resumes at $t\approx\SI{101.3}{s}$ with the new spool (orange).
+    \item The new colour is not wanted, so $C$ is pressed at $t\approx\SI{129.3}{s}$. A second filament change runs and printing resumes at $t\approx\SI{155.8}{s}$ (green).
+    \item The square is complete at $t\approx\SI{188.8}{s}$.
+\end{itemize}
 
 \begin{multicols}{2}
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=0.85\linewidth]{figures/q31/case1_colour_change/1_head_path.pdf}
-    \captionof{figure}{Case 1, head path: printed before the change (red), after (green), and travel moves.}
-    \label{fig:q31_case1_path}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/1_head_path.pdf}
+    \captionof{figure}{Head path: first spool (red), unwanted colour (orange), after the colour change (green) and travel moves.}
+    \label{fig:q31_final_path}
 \end{minipage}
 \medskip
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/case1_colour_change/2_nozzle_temperature.pdf}
-    \captionof{figure}{Case 1, nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
-    \label{fig:q31_case1_temp}
+    \includegraphics[width=\linewidth]{figures/q31/final_test/2_nozzle_temperature.pdf}
+    \captionof{figure}{Nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
+    \label{fig:q31_final_temp}
 \end{minipage}
 \medskip
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/case1_colour_change/3_nozzle_mode.pdf}
-    \captionof{figure}{Case 1, nozzle machine mode.}
-    \label{fig:q31_case1_nozzle}
+    \includegraphics[width=\linewidth]{figures/q31/final_test/3_nozzle_mode.pdf}
+    \captionof{figure}{Nozzle machine mode.}
+    \label{fig:q31_final_nozzle}
 \end{minipage}
 \medskip
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/case1_colour_change/4_printer_mode.pdf}
-    \captionof{figure}{Case 1, printer machine mode.}
-    \label{fig:q31_case1_printer}
+    \includegraphics[width=\linewidth]{figures/q31/final_test/4_printer_mode.pdf}
+    \captionof{figure}{Printer machine mode.}
+    \label{fig:q31_final_printer}
 \end{minipage}
 \medskip
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/case1_colour_change/5_filament_mode.pdf}
-    \captionof{figure}{Case 1, filament machine mode.}
-    \label{fig:q31_case1_filament}
+    \includegraphics[width=\linewidth]{figures/q31/final_test/5_filament_mode.pdf}
+    \captionof{figure}{Filament machine mode.}
+    \label{fig:q31_final_filament}
 \end{minipage}
 \medskip
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/case1_colour_change/6_filament_extruded.pdf}
-    \captionof{figure}{Case 1, extruded filament length $L$ against $L_{spool}$.}
-    \label{fig:q31_case1_extruded}
-\end{minipage}
-\medskip
-
-\end{multicols}
-
-\subsubsection{Case 2: $F$ Triggered}
-\label{sec:q31_case2}
-$C$ is never pressed. The spool holds half of the filament needed for the square, so $F$ occurs at $t\approx\SI{69.6}{s}$ and the same change sequence runs, resuming at $t\approx\SI{96.0}{s}$. The replacement spool has the same length, so $F$ occurs a second time at $t\approx\SI{158}{s}$ (resuming at $\SI{185.6}{s}$) and the square is complete at $t\approx\SI{191}{s}$.
-
-% \todo[inline]{Comment on the plots.}
-
-\begin{multicols}{2}\noindent\begin{minipage}{\linewidth}
-    \centering
-    \includegraphics[width=0.85\linewidth]{figures/q31/case2_filament_runout/1_head_path.pdf}
-    \captionof{figure}{Case 2, head path: printed before the change (red), after (green), and travel moves.}
-    \label{fig:q31_case2_path}
-\end{minipage}
-\medskip
-
-\noindent\begin{minipage}{\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/q31/case2_filament_runout/2_nozzle_temperature.pdf}
-    \captionof{figure}{Case 2, nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
-    \label{fig:q31_case2_temp}
-\end{minipage}
-\medskip
-
-\noindent\begin{minipage}{\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/q31/case2_filament_runout/3_nozzle_mode.pdf}
-    \captionof{figure}{Case 2, nozzle machine mode.}
-    \label{fig:q31_case2_nozzle}
-\end{minipage}
-\medskip
-
-\noindent\begin{minipage}{\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/q31/case2_filament_runout/4_printer_mode.pdf}
-    \captionof{figure}{Case 2, printer machine mode.}
-    \label{fig:q31_case2_printer}
-\end{minipage}
-\medskip
-
-\noindent\begin{minipage}{\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/q31/case2_filament_runout/5_filament_mode.pdf}
-    \captionof{figure}{Case 2, filament machine mode.}
-    \label{fig:q31_case2_filament}
-\end{minipage}
-\medskip
-
-\noindent\begin{minipage}{\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/q31/case2_filament_runout/6_filament_extruded.pdf}
-    \captionof{figure}{Case 2, extruded filament length $L$ against $L_{spool}$.}
-    \label{fig:q31_case2_extruded}
+    \includegraphics[width=\linewidth]{figures/q31/final_test/6_filament_extruded.pdf}
+    \captionof{figure}{Extruded filament length $L$ against $L_{spool}$.}
+    \label{fig:q31_final_extruded}
 \end{minipage}
 \medskip
 
