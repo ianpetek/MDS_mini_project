@@ -1,3 +1,277 @@
 \section{Finite State Machine}
 \label{sec:finite_state_machine}
 
+\subsection{Filament Replacement}
+\label{subsec:fsm_filament}
+
+This section presents the high-level control of the filament replacement, modelled as a Mealy machine since the next state and the output (status message and retry counter) both depend on the current state and input. The machine listens to the external events $C$ (a new colour is requested) and $F$ (the current spool is finished) and to the success or failure feedback of the low-level subsystems. It consists of two coupled sub-machines that are updated together: a \emph{printing} machine (idle, running or paused) and a \emph{filament replacement} machine that sequences the steps of Q2.1. A failed step is retried up to three times before the replacement is aborted.
+
+\subsubsection{Formal Machine Definition}
+\label{subsubsec:fsm_definition}
+
+The FSM is defined as the Mealy machine
+\begin{equation}
+\label{eq:fsm_tuple}
+\mathcal{M} = (Q, \Sigma, \Lambda, \delta, \lambda, q_0).
+\end{equation}
+
+\paragraph{States.} The state $q = (p, f, r)$ of printing state, filament replacement state and retries left,
+\begin{equation}
+\label{eq:fsm_states}
+\begin{aligned}
+Q &= P \times \mathcal{F} \times R, \\
+P &= \{\texttt{IDLE}, \texttt{IN\_PROG}, \texttt{PAUSED}\}, \\
+\mathcal{F} &= \{\texttt{IDLE}, \texttt{MOVE}, \texttt{WIPE}, \texttt{COOL}, \texttt{LOAD}, \texttt{HEAT}\}, \\
+R &= \{0, 1, 2, 3\},
+\end{aligned}
+\end{equation}
+where \texttt{MOVE} is moving to the wipe location, \texttt{WIPE} is wiping the excess filament, \texttt{COOL} is the nozzle heat switched off, \texttt{LOAD} is loading the new filament and \texttt{HEAT} is the nozzle heat switched on. Saving the head location (step~1 of Q2.1) is the action on entering \texttt{MOVE}, and resuming the print (step~7) is the action on leaving \texttt{HEAT}. The initial state is $q_0 = (\texttt{IDLE}, \texttt{IDLE}, 3)$.
+
+% \todo[inline]{The notebook also declares \texttt{ABORTED}, \texttt{FAILED} and \texttt{COMPLETED} printing states, but the transition table has no transitions for them, so they are left out of $P$ here.}
+
+
+\paragraph{Inputs.} At each step the FSM can accept a pair of inputs $\sigma = (e, y)$, where $e$ represents external event i.e $C$, $F$ or nothing. 
+$y$ represents the feedback of the outcome of the current filament state being executed. It is represented by $\mathrm{ok}_k$ if step $k$ succeeded and $\mathrm{fail}_k$ if it failed, for each of the five replacement steps $k \in K = \mathcal{F} \setminus \{\texttt{IDLE}\} = \{\texttt{MOVE}, \texttt{WIPE}, \texttt{COOL}, \texttt{LOAD}, \texttt{HEAT}\}$. For example, $\mathrm{fail}_{\texttt{WIPE}}$ means that the wiping did not succeed.
+
+In total there are $3$ external events and $1 + 2 \cdot 5 = 11$ feedback values, so the input alphabet has $3 \cdot 11 = 33$ elements:
+\begin{equation}
+\label{eq:fsm_inputs}
+\begin{aligned}
+E &= \{C,\, F,\, \varepsilon\}, \\
+Y &= \{\varepsilon,\ \mathrm{ok}_{\texttt{MOVE}},\, \mathrm{fail}_{\texttt{MOVE}},\ \mathrm{ok}_{\texttt{WIPE}},\, \mathrm{fail}_{\texttt{WIPE}},\ \dots,\ \mathrm{ok}_{\texttt{HEAT}},\, \mathrm{fail}_{\texttt{HEAT}}\}, \\
+\Sigma &= E \times Y.
+\end{aligned}
+\end{equation}
+
+\paragraph{Outputs.} The output alphabet $\lambda$ represents the set of output messages sent to the user on each transition. For example,\ ``filament change in progress'', ``$k$ successful'', ``$k$ failure, trying again'', ``filament change process failed, initiate filament change again'' and ``filament change already in progress''.
+
+
+
+\paragraph{Transition and output functions.} The transition function $\delta : Q \times \Sigma \to Q$ and output function $\lambda : Q \times \Sigma \to \Lambda$ are given by the transition table and  below. Here $\mathrm{next}(k)$ is the step after $k$ in the order $\texttt{MOVE} \to \texttt{WIPE} \to \texttt{COOL} \to \texttt{LOAD} \to \texttt{HEAT}$, and $r$ is the number of retries left, reset to $3$ on every new step. 
+
+
+The following cases can occur, depending on the filament replacement state $f$ and the input $\sigma = (e, y)$:
+\begin{itemize}[noitemsep]
+  \item \textbf{Start.} If $f = \texttt{IDLE}$ and the event $e$ is $C$ or $F$, the replacement starts: the machine moves to \texttt{MOVE}, and a running print ($p = \texttt{IN\_PROG}$) is paused, while an idle or already paused printer keeps its printing state.
+  \item \textbf{Event during a replacement.} If $f \neq \texttt{IDLE}$ and $e$ is $C$ or $F$, the event is ignored and the state is unchanged; the output message is ``filament change already in progress''.
+  \item \textbf{Step succeeded.} On $\mathrm{ok}_k$ in step $f = k$, the machine moves on to $\mathrm{next}(k)$, with $r = 3$.
+  \item \textbf{Last step succeeded.} On $\mathrm{ok}_{\texttt{HEAT}}$ the replacement is finished: the machine returns to $f = \texttt{IDLE}$, and a paused print is resumed ($p = \texttt{PAUSED} \to \texttt{IN\_PROG}$).
+  \item \textbf{Step failed, retries left.} On $\mathrm{fail}_k$ with $r > 0$, the machine stays in step $k$ and the number of retries is reduced by one, $r' = r - 1$, so the step is tried again.
+  \item \textbf{Step failed, no retries left.} On $\mathrm{fail}_k$ with $r = 0$, the replacement is aborted: the machine returns to $f = \texttt{IDLE}$ with $r = 3$, and the message asks the user to start the filament change again.
+  \item \textbf{Anything else.} An input for which the table has no row (e.g.\ a feedback from a step that is not active) leaves the state unchanged and returns the message \texttt{NO MATCHING TRANSITION}.
+\end{itemize}
+Each of these cases has its own output message, which is the output $\lambda$ of the transition.
+
+\paragraph{Implementation.} The machine is implemented as a state transition table loaded into a pandas dataframe in \texttt{fsm.ipynb}. A snapshot of the table is shown in Table~\ref{tab:fsm_table}. 
+
+Every row describes one of the transition cases defined above. The first five columns (printing state, filament state, retries left, external input and system feedback) are the conditions that the current state and input must satisfy, and the last four columns are the output state, the retries left and the output message. The entry \texttt{X} represents \texttt{DON'T CARE} condition where the current state of this variable does not influence the output in any manner. An empty input cell means that the signal is absent and must match exactly. The rows are checked from top to bottom and the first row whose conditions all hold is applied; if no row matches, the state is left unchanged and the message \texttt{NO MATCHING TRANSITION} is returned.
+
+The machine is implemented as a state transition table loaded into a pandas dataframe in \texttt{fsm.ipynb}. A snapshot of the table is shown in Table~\ref{tab:fsm_table}. 
+
+\begin{table}[H]
+\small
+\centering
+\caption{Snapshot of the state transition table (state names abbreviated, \texttt{X} is a \texttt{DON'T CARE}, empty cells mean no signal).}
+\label{tab:fsm_table}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllllllll}
+\toprule
+$p$ & $f$ & $e$ & $y$ & $r$ & $p'$ & $f'$ & message & $r'$ \\
+\midrule
+\texttt{IDLE}        & \texttt{IDLE} & \texttt{C} &  & \texttt{X} & \texttt{IDLE}   & \texttt{MOVE} & filament change in progress & 3 \\
+\texttt{IN\_PROG}    & \texttt{IDLE} & \texttt{C} &  & \texttt{X} & \texttt{PAUSED} & \texttt{MOVE} & filament change in progress & 3 \\
+\texttt{X}           & \texttt{MOVE} &  & \texttt{ok\_MOVE}   & \texttt{X} & \texttt{X} & \texttt{WIPE} & moving to wiping location successful & 3 \\
+\texttt{X}           & \texttt{MOVE} &  & \texttt{fail\_MOVE} & \texttt{3} & \texttt{X} & \texttt{MOVE} & failure, trying again & 2 \\
+\texttt{X}           & \texttt{MOVE} &  & \texttt{fail\_MOVE} & \texttt{0} & \texttt{X} & \texttt{IDLE} & process failed, initiate again & 3 \\
+\texttt{PAUSED}      & \texttt{HEAT} &  & \texttt{ok\_HEAT}   & \texttt{X} & \texttt{IN\_PROG} & \texttt{IDLE} & nozzle heating successful & 3 \\
+\texttt{X}           & \texttt{WIPE} & \texttt{C} & \texttt{X} & \texttt{X} & \texttt{X} & \texttt{WIPE} & filament change already in progress & \texttt{X} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The model was checked against a set of different test cases (\texttt{test\_cases.csv}).
+
+\subsubsection{Transition }
+\label{subsubsec:fsm_}
+
+The two sub-machines are shown in Figures~\ref{fig:fsm_printing} and~\ref{fig:fsm_filament}. Transitions are labelled as \emph{input}~[\emph{guard condition}]~/~\emph{action}, where $r$ is the number of retries left. A $C$ or $F$ event starts the replacement only when the filament replacement machine is in its idle state; while a replacement is running, further $C$ or $F$ events are ignored (self-loop with the message ``filament change already in progress''). If a $C$ or $F$ event arrives in the same step as a feedback signal, the external event takes precedence and the feedback is discarded.
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fsm, node distance=1.2cm and 3.6cm]
+  \node[state, initial, initial text={}] (pi) {\texttt{IDLE}};
+  \node[state, right=of pi]              (pr) {\texttt{IN\_PROG}};
+  \node[state, right=of pr]              (pp) {\texttt{PAUSED}};
+
+  \path
+    (pr) edge[bend left=20]  node[above] {$C \lor F$ [$f = \texttt{IDLE}$]} (pp)
+    (pp) edge[bend left=20]  node[below] {$\mathrm{ok}_{\mathrm{HEAT}}$} (pr);
+\end{tikzpicture}
+\caption{Printing sub-machine with state $p \in P$. The transition from \texttt{IDLE} to \texttt{IN\_PROG} (print started) belongs to the print job handling and is not modelled here.}
+\label{fig:fsm_printing}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fsm, node distance=1.8cm]
+  \node[state] (sm) {\texttt{MOVE}};
+  \node[state, right=of sm] (sw) {\texttt{WIPE}};
+  \node[state, right=of sw] (sc) {\texttt{COOL}};
+  \node[state, right=of sc] (sl) {\texttt{LOAD}};
+  \node[state, right=of sl] (sh) {\texttt{HEAT}};
+  \node[state, initial above, initial text={}] (si) at ($(sc)+(0,3.0)$) {\texttt{IDLE}};
+
+  \path
+    (si) edge[bend right=20] node[above left]  {$C \lor F$ / $r \gets 3$} (sm)
+    (sm) edge node[above, align=center] {$\mathrm{ok}_{\mathrm{MOVE}}$\\/ $r \gets 3$} (sw)
+    (sw) edge node[above, align=center] {$\mathrm{ok}_{\mathrm{WIPE}}$\\/ $r \gets 3$} (sc)
+    (sc) edge node[above, align=center] {$\mathrm{ok}_{\mathrm{COOL}}$\\/ $r \gets 3$} (sl)
+    (sl) edge node[above, align=center] {$\mathrm{ok}_{\mathrm{LOAD}}$\\/ $r \gets 3$} (sh)
+    (sh) edge[bend right=20] node[above right] {$\mathrm{ok}_{\mathrm{HEAT}}$ / $r \gets 3$} (si);
+
+  \foreach \s/\n in {sm/MOVE, sw/WIPE, sc/COOL, sl/LOAD, sh/HEAT}{
+    \path (\s) edge[loop below] node[below, align=center, font=\scriptsize]
+      {$\mathrm{fail}_{\mathrm{\n}}$\\$[r > 0]$\\/ $r \gets r - 1$} (\s);
+  }
+
+  % the r = 0 failures of all steps return to IDLE
+  \coordinate (top) at ($(sw.north)+(0,0.8)$);
+  \node[draw, dashed, rounded corners, inner sep=8pt, fit=(sm) (sh) (top)] (steps) {};
+  \draw[->, dashed] (steps.north) -- node[right, align=left]
+    {$\mathrm{fail}_k$ $[r = 0]$\\/ $r \gets 3$} (si.south);
+\end{tikzpicture}
+\caption{Filament replacement sub-machine with state $f \in \mathcal{F}$. For readability the five $\mathrm{fail}_k\,[r=0]$ transitions from the steps $k$ back to \texttt{IDLE} are drawn as a single dashed arrow from the box around the steps. The two sub-machines are synchronised: the $C \lor F$ event and the $\mathrm{ok}_{\mathrm{HEAT}}$ event act on both machines in the same step.}
+\label{fig:fsm_filament}
+\end{figure}
+
+\subsection{Parked Detection}
+\label{subsec:dfa_parked}
+
+The head is parked at the origin when both the horizontal and the vertical motion have hit their end of line, i.e.\ a motion was commanded but the corresponding motor did not rotate. The detector is the Deterministic Finite Automaton (DFA)
+\begin{equation}
+\label{eq:dfa_tuple}
+\mathcal{A} = (Q_A, \Sigma_A, \delta_A, q_{A,0}, F_A)
+\end{equation}
+with
+\begin{equation}
+\label{eq:dfa_sets}
+\begin{aligned}
+Q_A &= \{q_0, q_1, q_2, q_3\}, \\
+\Sigma_A &= M \times m = \{(H,+), (H,0), (V,+), (V,0)\}, \\
+q_{A,0} &= q_0, \qquad F_A = \{q_3\},
+\end{aligned}
+\end{equation}
+where the states have the meaning
+\begin{itemize}[noitemsep]
+  \item $q_0$: no end of line detected,
+  \item $q_1$: horizontal end of line (left side) detected,
+  \item $q_2$: vertical end of line (bottom side) detected,
+  \item $q_3$: both detected, the head is parked.
+\end{itemize}
+The transition function $\delta_A : Q_A \times \Sigma_A \to Q_A$ is given in Table~\ref{tab:dfa_delta} and drawn in Figure~\ref{fig:dfa_}. 
+
+
+\begin{table}[H]
+\centering
+\caption{Transition function $\delta_A$ of the parked detector.}
+\label{tab:dfa_delta}
+\begin{tabular}{ccccc}
+\toprule
+$q$ & $(H,+)$ & $(H,0)$ & $(V,+)$ & $(V,0)$ \\
+\midrule
+$\rightarrow q_0$ & $q_0$ & $q_1$ & $q_0$ & $q_2$ \\
+$q_1$             & $q_0$ & $q_1$ & $q_1$ & $q_3$ \\
+$q_2$             & $q_2$ & $q_3$ & $q_0$ & $q_2$ \\
+$*\,q_3$          & $q_2$ & $q_3$ & $q_1$ & $q_3$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fsm, node distance=2.4cm and 4.2cm]
+  \node[state, initial, initial text={}] (q0) {$q_0$};
+  \node[state, above right=of q0]        (q1) {$q_1$};
+  \node[state, below right=of q0]        (q2) {$q_2$};
+  \node[state, accepting, below right=of q1] (q3) {$q_3$};
+
+  \path
+    (q0) edge[loop above]   node[above] {$(H,+)$, $(V,+)$} (q0)
+    (q0) edge[bend left=15] node[above left]  {$(H,0)$} (q1)
+    (q0) edge[bend right=15] node[below left] {$(V,0)$} (q2)
+
+    (q1) edge[loop above]   node[above] {$(H,0)$, $(V,+)$} (q1)
+    (q1) edge[bend left=15] node[below right] {$(H,+)$} (q0)
+    (q1) edge[bend left=15] node[above right, pos=0.4] {$(V,0)$} (q3)
+
+    (q2) edge[loop below]   node[below] {$(H,+)$, $(V,0)$} (q2)
+    (q2) edge[bend right=15] node[above right] {$(V,+)$} (q0)
+    (q2) edge[bend right=15] node[below right, pos=0.4] {$(H,0)$} (q3)
+
+    (q3) edge[loop right]   node[right, align=center] {$(H,0)$\\$(V,0)$} (q3)
+    (q3) edge[bend left=15] node[below left, pos=0.6] {$(V,+)$} (q1)
+    (q3) edge[bend right=15] node[above left, pos=0.6] {$(H,+)$} (q2);
+\end{tikzpicture}
+\caption{Transition  of the parked detector $\mathcal{A}$. The accepted language is the set of sequences $\sigma$ that end in $q_3$.}
+\label{fig:dfa_}
+\end{figure}
+
+
+\subsection{Detecting the Other Corners}
+\label{subsubsec:dfa_corners}
+
+The automaton is extended to the motions $H_x$, $H_y$ and $V$ and to the angular velocities $+$, $-$ and $0$,
+\begin{equation}
+\label{eq:dfa_corners}
+\begin{aligned}
+\mathcal{A}' &= (Q_A, \Sigma_A', \delta_A', q_0, F_A), \\
+\Sigma_A' &= \{H_x, H_y, V\} \times \{+, -, 0\},
+\end{aligned}
+\end{equation}
+with $Q_A$, $q_0$ and $F_A$ as before. The transition function $\delta_A' : Q_A \times \Sigma_A' \to Q_A$ is given in Table~\ref{tab:dfa_corners_delta} and drawn in Figure~\ref{fig:dfa_corners}.
+
+\begin{table}[H]
+\centering
+\caption{Transition function $\delta_A'$ of the corner detector.}
+\label{tab:dfa_corners_delta}
+\begin{tabular}{cccccc}
+\toprule
+$q$ & $(H_x,\pm)$ & $(H_x,0)$ & $(H_y,\pm)$ & $(H_y,0)$ & $(V,\cdot)$ \\
+\midrule
+$\rightarrow q_0$ & $q_0$ & $q_1$ & $q_0$ & $q_2$ & $q_0$ \\
+$q_1$             & $q_0$ & $q_1$ & $q_1$ & $q_3$ & $q_1$ \\
+$q_2$             & $q_2$ & $q_3$ & $q_0$ & $q_2$ & $q_2$ \\
+$*\,q_3$          & $q_2$ & $q_3$ & $q_1$ & $q_3$ & $q_3$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[fsm, node distance=2.4cm and 4.2cm]
+  \node[state, initial, initial text={}] (q0) {$q_0$};
+  \node[state, above right=of q0]        (q1) {$q_1$};
+  \node[state, below right=of q0]        (q2) {$q_2$};
+  \node[state, accepting, below right=of q1] (q3) {$q_3$};
+
+  \path
+    (q0) edge[loop above]   node[above, align=center] {$(H_x,\pm)$\\$(H_y,\pm)$\\$(V,\cdot)$} (q0)
+    (q0) edge[bend left=15] node[above left]  {$(H_x,0)$} (q1)
+    (q0) edge[bend right=15] node[below left] {$(H_y,0)$} (q2)
+
+    (q1) edge[loop above]   node[above, align=center] {$(H_x,0)$, $(H_y,\pm)$, $(V,\cdot)$} (q1)
+    (q1) edge[bend left=15] node[below right] {$(H_x,\pm)$} (q0)
+    (q1) edge[bend left=15] node[above right, pos=0.4] {$(H_y,0)$} (q3)
+
+    (q2) edge[loop below]   node[below, align=center] {$(H_x,\pm)$, $(H_y,0)$, $(V,\cdot)$} (q2)
+    (q2) edge[bend right=15] node[above right] {$(H_y,\pm)$} (q0)
+    (q2) edge[bend right=15] node[below right, pos=0.4] {$(H_x,0)$} (q3)
+
+    (q3) edge[loop right]   node[right, align=center] {$(H_x,0)$\\$(H_y,0)$\\$(V,\cdot)$} (q3)
+    (q3) edge[bend left=15] node[below left, pos=0.6] {$(H_y,\pm)$} (q1)
+    (q3) edge[bend right=15] node[above left, pos=0.6] {$(H_x,\pm)$} (q2);
+\end{tikzpicture}
+\caption{Transition  of the corner detector $\mathcal{A}'$.}
+\label{fig:dfa_corners}
+\end{figure}

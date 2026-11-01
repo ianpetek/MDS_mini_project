@@ -9,6 +9,10 @@
 \usepackage{hyperref}
 \usepackage{bm}
 \usepackage{todonotes}
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows.meta,calc,fit}
+\tikzset{fsm/.style={->, >={Stealth[round]}, shorten >=1pt, auto, font=\small,
+  every state/.style={draw, rounded corners, minimum size=1cm, inner sep=3pt}}}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
 
 \graphicspath{{images/}}
