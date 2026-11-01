@@ -5,15 +5,19 @@
 
 \input{frontmatter/titlepage}
 \setcounter{section}{-1}
+\pagenumbering{roman}
 
 \input{chapters/introduction}
 \clearpage
+\pagenumbering{arabic} % page 1 starts at Physical Modelling
 \input{chapters/physical_modelling}
-\clearpage
 \input{chapters/finite_state_machine}
 \input{chapters/hybrid_system}
 
 \bibliographystyle{plainnat}
 \bibliography{references}
+
+\appendix
+\input{chapters/appendix}
 
 \end{document}

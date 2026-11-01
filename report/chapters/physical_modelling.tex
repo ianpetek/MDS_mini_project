@@ -6,22 +6,18 @@ The first task is to derive the direct kinematics of the Core XY mechanism. This
 
 \begin{equation}
 \label{eq:belt_kinematics}
-\begin{aligned}
-\Delta L &= \Delta x + \Delta y \\
-\Delta R &= \Delta x - \Delta y \\
-\Delta x &= \frac{\Delta L + \Delta R}{2} \\
-\Delta y &= \frac{\Delta L - \Delta R}{2}
-\end{aligned}
+\Delta L = \Delta x + \Delta y, \qquad
+\Delta R = \Delta x - \Delta y, \qquad
+\Delta x = \frac{\Delta L + \Delta R}{2}, \qquad
+\Delta y = \frac{\Delta L - \Delta R}{2}
 \end{equation}
 
 With $\Delta L$ and $\Delta R$ being the length of belt moved by the motors, and $\Delta x$ and $\Delta y$ being the change in position of the tool head.
 
 \begin{equation}
 \label{eq:belt_motor}
-\begin{aligned}
-\Delta L &= r_m \, \theta_L \\
-\Delta R &= r_m \, \theta_R
-\end{aligned}
+\Delta L = r_m \, \theta_L, \qquad
+\Delta R = r_m \, \theta_R
 \end{equation}
 
 If we assume that in the beginning the motors are at
@@ -31,20 +27,16 @@ $\theta_L = \theta_R = 0$ and the tool head is at $(0, 0)$, we get the following
 
 \begin{equation}
 \label{eq:kinematics}
-\begin{aligned}
-x(\theta_L, \theta_R) &= \frac{r_m \theta_L + r_m \theta_R}{2}
-  = \frac{r_m}{2} \left( \theta_L + \theta_R \right) \\
-y(\theta_L, \theta_R) &= \frac{r_m \theta_L - r_m \theta_R}{2}
+x(\theta_L, \theta_R) = \frac{r_m \theta_L + r_m \theta_R}{2}
+  = \frac{r_m}{2} \left( \theta_L + \theta_R \right), \qquad
+y(\theta_L, \theta_R) = \frac{r_m \theta_L - r_m \theta_R}{2}
   = \frac{r_m}{2} \left( \theta_L - \theta_R \right)
-\end{aligned}
 \end{equation}
 
 \begin{equation}
 \label{eq:kinematics_vel}
-\begin{aligned}
-\dot{x}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L + \dot{\theta}_R \right) \\
-\dot{y}(\dot{\theta}_L, \dot{\theta}_R) &= \frac{r_m}{2} \left( \dot{\theta}_L - \dot{\theta}_R \right)
-\end{aligned}
+\dot{x}(\dot{\theta}_L, \dot{\theta}_R) = \frac{r_m}{2} \left( \dot{\theta}_L + \dot{\theta}_R \right), \qquad
+\dot{y}(\dot{\theta}_L, \dot{\theta}_R) = \frac{r_m}{2} \left( \dot{\theta}_L - \dot{\theta}_R \right)
 \end{equation}
 
 \subsection{Dynamics}
@@ -78,26 +70,44 @@ As the whole system is planar, we can see that there are no potential energy ter
 \subsubsection*{Dissipative Energy}
 Secondly, we find the dissipative energy terms. Each motor has 4 rotational bearings, and 4 linear bearings for the whole system, two along each axis. We define $r_b$ as the bearing radius, later it will be kept the same as the motor radius for simplicity. From \eqref{eq:kinematics}, we can get transformations \eqref{eq:inverse_kinematics} with trivial time derivatives.  
 
-\todo{This needs to be corrected, not all bearings roll at all times, they depend on what motor rotates}
 \begin{equation}
 \label{eq:inverse_kinematics}
-\theta_{b,L} = \frac{ x +  y}{r_b},
+\theta_{b,L1} = \frac{ x +  y}{r_b},
 \qquad
-\theta_{b,R} = \frac{ x - y}{r_b}
+\theta_{b,R1} = \frac{ x - y}{r_b}
 \end{equation}
-Then, for each side we get rotational dissipative energy:
+
+These are used for the two fixed bearings on each belt. Then, for each side we get rotational dissipative energy:
 \begin{equation*}
 \begin{aligned}
-D_L &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L}^2\,\mu_r 
-    = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
-D_R &= 4\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R}^2\,\mu_r 
-    = 2\mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
+D_{L1} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L1}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\left[\dot x^2 + 2\dot x\dot y + \dot y^2\right] \\
+D_{R1} &= 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R1}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\left[\dot x^2 - 2\dot x\dot y + \dot y^2\right]
 \end{aligned}
+\end{equation*}
+
+For the two carriage bearings, if we assume the belt to be horizontal on the carriage like Figure~\ref{fig:printer_schematic} shows them, they are rotating only when the carriage moves along the $x$ axis.
+
+\begin{equation}
+\label{eq:carriage_kinematics}
+\theta_{b,L2} = \frac{ x }{r_b},
+\qquad
+\theta_{b,R2} = \frac{ x }{r_b}
+\end{equation}
+
+With that we get two more terms:
+
+\begin{equation*}
+D_{L2} = 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,L2}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\dot x^2, \qquad
+D_{R2} = 2\cdot \tfrac{1}{2}\cdot \dot\theta_{b,R2}^2\,\mu_r 
+    = \mu_r \frac{1}{r_b^2}\dot x^2
 \end{equation*}
 
 Then simply combining them:
 \begin{equation*}
-\boxed{D_{\mathrm{rot}} = 4\,\frac{\mu_r}{r_b^2}\left[\dot x^2 + \dot y^2\right]}
+\boxed{D_{\mathrm{rot}} = \frac{\mu_r}{r_b^2}\left[4\dot x^2 + 2\dot y^2\right]}
 \end{equation*}
 
 Similarly, we get the linear dissipative energy:
@@ -110,20 +120,11 @@ Then, combining the terms we get:
 \begin{equation}
 \label{eq:dissipation_mech}
 D_{\mathrm{mech}} = \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,x}\right]\dot x^2
-    + \left[4\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
+    + \left[2\,\frac{\mu_r}{r_b^2} + \mu_{l,y}\right]\dot y^2
 \end{equation}
 
-\clearpage
-
 \subsubsection{Electrical Part}
-Now we model the energies of the electrical part of the system. Keep in mind that both motors are the same. Below we can see the equivalent circuit of a DC motor:
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.6\textwidth]{motor_sch.png}
-  \caption{Equivalent circuit of a DC motor.}
-  \label{fig:motor_circuit}
-\end{figure}
+Now we model the energies of the electrical part of the system. Keep in mind that both motors are the same.
 
 \subsubsection*{Kinetic Energy}
 The inductor and the inertial element will contribute to the kinetic energy of this part of the system. Similarly to \eqref{eq:inverse_kinematics}, using the motor shaft radius:
@@ -148,11 +149,9 @@ As there are no capacitors in the system, there is no potential energy change as
 The only dissipative term in the electrical part of the system is the resistor:
 
 \begin{equation}
-  \begin{gathered}
     D_{\mathrm{el},L} = \tfrac{1}{2} i_L^2 R_m, \qquad 
-    D_{\mathrm{el},R} = \tfrac{1}{2} i_R^2 R_m \\
+    D_{\mathrm{el},R} = \tfrac{1}{2} i_R^2 R_m, \qquad
     D_{\mathrm{el}} = \tfrac{1}{2} R_m \left(i_L^2 + i_R^2\right)
-  \end{gathered}
 \end{equation}
 
 \subsubsection*{Matrix Equations}
@@ -169,20 +168,18 @@ D = \tfrac{1}{2}\,\dot q^\top \mathbf{N}\,\dot q
 With corresponding matrices:
 
 \begin{equation}
-\begin{aligned}
-\mathbf{M} &= \begin{bmatrix}
+\mathbf{M} = \begin{bmatrix}
 m + J_m \dfrac{2}{r_m^2} & 0 & 0 & 0 \\
 0 & m + J_m \dfrac{2}{r_m^2} & 0 & 0 \\
 0 & 0 & L_m & 0 \\
 0 & 0 & 0 & L_m
-\end{bmatrix} \\
-\mathbf{N} &= \begin{bmatrix}
+\end{bmatrix}, \qquad
+\mathbf{N} = \begin{bmatrix}
 8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,x} & 0 & 0 & 0 \\
-0 & 8\dfrac{\mu_r}{r_b^2} + 2\mu_{l,y} & 0 & 0 \\
+0 & 4\dfrac{\mu_r}{r_b^2} + 2\mu_{l,y} & 0 & 0 \\
 0 & 0 & R_m & 0 \\
 0 & 0 & 0 & R_m
 \end{bmatrix}
-\end{aligned}
 \end{equation}
 
 
@@ -229,11 +226,9 @@ Using the fact that this is a linear system and there are no potential energies 
 \end{equation*}
 
 \begin{equation*}
-\begin{aligned}
-\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} &= \frac{d}{dt}\left(\mathbf{M}\dot q\right) = \mathbf{M}\ddot q \\
-\frac{\partial \mathcal{L}}{\partial q} &= 0 \\
-\frac{\partial D}{\partial \dot q} &= \mathbf{N}\dot q
-\end{aligned}
+\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot q} = \frac{d}{dt}\left(\mathbf{M}\dot q\right) = \mathbf{M}\ddot q, \qquad
+\frac{\partial \mathcal{L}}{\partial q} = 0, \qquad
+\frac{\partial D}{\partial \dot q} = \mathbf{N}\dot q
 \end{equation*}
 
 And finally solving the Euler--Lagrange equation:
@@ -258,7 +253,7 @@ Expanding back out of matrix form we get:
   + \left(8\frac{\mu_r}{r_b^2} + 2\mu_{l,x}\right)\dot x
   - \frac{K_m}{r_m} i_L - \frac{K_m}{r_m} i_R &= 0 \\
 \left(m + J_m\frac{2}{r_m^2}\right)\ddot y
-  + \left(8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right)\dot y
+  + \left(4\frac{\mu_r}{r_b^2} + 2\mu_{l,y}\right)\dot y
   - \frac{K_m}{r_m} i_L + \frac{K_m}{r_m} i_R &= 0 \\
 L_m \frac{di_L}{dt} + R_m i_L + \frac{K_m}{r_m}\dot x + \frac{K_m}{r_m}\dot y - u_{m,L} &= 0 \\
 L_m \frac{di_R}{dt} + R_m i_R + \frac{K_m}{r_m}\dot x - \frac{K_m}{r_m}\dot y - u_{m,R} &= 0
@@ -272,7 +267,7 @@ m_{\mathrm{eq}} = m + \frac{2J_m}{r_m^2},
 \qquad
 b_x = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,x},
 \qquad
-b_y = 8\frac{\mu_r}{r_b^2} + 2\mu_{l,y}
+b_y = 4\frac{\mu_r}{r_b^2} + 2\mu_{l,y}
 \end{equation*}
 
 \begin{equation}
@@ -325,10 +320,8 @@ To decouple the system, we introduce a set of useful substitutions:
 \label{eq:decoupling_subs}
 \boxed{
 \begin{aligned}
-i_x &= i_L + i_R, & u_{m,x} &= u_{m,L} + u_{m,R} \\
-i_y &= i_L - i_R, & u_{m,y} &= u_{m,L} - u_{m,R} \\
-i_L &= \frac{i_x + i_y}{2}, & u_{m,L} &= \frac{u_{m,x} + u_{m,y}}{2} \\
-i_R &= \frac{i_x - i_y}{2}, & u_{m,R} &= \frac{u_{m,x} - u_{m,y}}{2}
+i_x &= i_L + i_R, & i_y &= i_L - i_R, & u_{m,x} &= u_{m,L} + u_{m,R}, & u_{m,y} &= u_{m,L} - u_{m,R} \\
+i_L &= \frac{i_x + i_y}{2}, & i_R &= \frac{i_x - i_y}{2}, & u_{m,L} &= \frac{u_{m,x} + u_{m,y}}{2}, & u_{m,R} &= \frac{u_{m,x} - u_{m,y}}{2}
 \end{aligned}}
 \end{equation}
 
@@ -349,20 +342,16 @@ Then by adding and subtracting the two equations to cancel terms we get:
 
 \begin{equation}
 \label{eq:decoupled_currents}
-\begin{aligned}
-\frac{di_x}{dt} &= -\frac{2K_m}{r_m L_m}\dot x - \frac{R_m}{L_m} i_x + \frac{1}{L_m} u_{m,x} \\
-\frac{di_y}{dt} &= -\frac{2K_m}{r_m L_m}\dot y - \frac{R_m}{L_m} i_y + \frac{1}{L_m} u_{m,y}
-\end{aligned}
+\frac{di_x}{dt} = -\frac{2K_m}{r_m L_m}\dot x - \frac{R_m}{L_m} i_x + \frac{1}{L_m} u_{m,x}, \qquad
+\frac{di_y}{dt} = -\frac{2K_m}{r_m L_m}\dot y - \frac{R_m}{L_m} i_y + \frac{1}{L_m} u_{m,y}
 \end{equation}
 
 And by substituting \eqref{eq:decoupling_subs} into the first two equations of \eqref{eq:state_equations}:
 
 \begin{equation}
 \label{eq:decoupled_motion}
-\begin{aligned}
-\ddot x &= -\frac{b_x}{m_{\mathrm{eq}}}\dot x + \frac{K_m}{m_{\mathrm{eq}} r_m} i_x \\
-\ddot y &= -\frac{b_y}{m_{\mathrm{eq}}}\dot y + \frac{K_m}{m_{\mathrm{eq}} r_m} i_y
-\end{aligned}
+\ddot x = -\frac{b_x}{m_{\mathrm{eq}}}\dot x + \frac{K_m}{m_{\mathrm{eq}} r_m} i_x, \qquad
+\ddot y = -\frac{b_y}{m_{\mathrm{eq}}}\dot y + \frac{K_m}{m_{\mathrm{eq}} r_m} i_y
 \end{equation}
 
 And finally:
@@ -405,10 +394,8 @@ Rearranging the decoupled equations of motion \eqref{eq:decoupled_motion}, we ca
 \begin{equation}
 \label{eq:inverse_currents}
 \boxed{
-\begin{aligned}
-i_x &= \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x \\
-i_y &= \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y
-\end{aligned}}
+i_x = \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot x + \frac{b_x r_m}{K_m}\,\dot x, \qquad
+i_y = \frac{m_{\mathrm{eq}} r_m}{K_m}\,\ddot y + \frac{b_y r_m}{K_m}\,\dot y}
 \end{equation}
 
 The motor equations for each motor are:
@@ -433,10 +420,8 @@ and similarly by subtracting them, we get the decoupled input voltages, consiste
 \begin{equation}
 \label{eq:inverse_voltages}
 \boxed{
-\begin{aligned}
-u_{m,x} &= L_m \frac{di_x}{dt} + R_m i_x + \frac{2K_m}{r_m}\,\dot x \\
-u_{m,y} &= L_m \frac{di_y}{dt} + R_m i_y + \frac{2K_m}{r_m}\,\dot y
-\end{aligned}}
+u_{m,x} = L_m \frac{di_x}{dt} + R_m i_x + \frac{2K_m}{r_m}\,\dot x, \qquad
+u_{m,y} = L_m \frac{di_y}{dt} + R_m i_y + \frac{2K_m}{r_m}\,\dot y}
 \end{equation}
 
 The original motor voltages then follow from \eqref{eq:decoupling_subs}:
@@ -463,10 +448,8 @@ y(t) = k + b\sin t
 We also need the derivatives up to the third order:
 
 \begin{equation*}
-\begin{aligned}
-\dot x &= -a\sin t, & \ddot x &= -a\cos t, & \dddot x &= a\sin t \\
-\dot y &= b\cos t,  & \ddot y &= -b\sin t, & \dddot y &= -b\cos t
-\end{aligned}
+\dot x = -a\sin t, \quad \ddot x = -a\cos t, \quad \dddot x = a\sin t, \qquad
+\dot y = b\cos t, \quad \ddot y = -b\sin t, \quad \dddot y = -b\cos t
 \end{equation*}
 
 Substituting into \eqref{eq:inverse_currents}:
@@ -521,15 +504,6 @@ Simulating the given system with parameters defined in Table~\ref{tab:symbols}, 
   \label{fig:elipse}
 \end{figure}
 
-As this is open-loop control, this good result relies on a good parameter estimation. If we change the parameters of the model by $\pm 5\%$ we can see that an error immediately arises.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics{elipse_simulated_perturbed.pdf}
-  \caption{Open-loop drawing of an ellipse with model parameters perturbed by $\pm 5\%$.}
-  \label{fig:elipse_perturbed}
-\end{figure}
-
 \subsubsection*{Arbitrary Drawing}
 
 As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will allow us to get an analytical solution. With that in mind we can draw arbitrary shapes by approximating them with quartic splines. Using MATLAB's \textit{bwboundaries} function to detect edges of shapes, in combination with \textit{spapi} which gives us an interpolating quartic spline given a set of points, we can draw the \textit{TU Delft} logo\footnote{Different letter boundaries are connected by straight lines so the whole drawing can be one input function}.
@@ -553,44 +527,24 @@ As stated in the derivation, any $C^3$ function used for $x(t)$ and $y(t)$ will 
   \label{fig:tu_delft}
 \end{figure}
 
-Again, like with the ellipse, the logo, because of its sharp corners, is even more sensitive to inaccuracies in the model parameters. If we again perturb the parameters by $\pm 5\%$ we see that control of this form would not be useful anymore.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics{tu_delft_perturbed.pdf}
-  \caption{Open-loop drawing of the \textit{TU Delft} logo with model parameters perturbed by $\pm 5\%$.}
-  \label{fig:tu_delft_perturbed}
-\end{figure}
-
 
 \subsubsection{Modelling the Nozzle}
-In the following section we model the nozzle of the 3D printer (Figure~\ref{fig:nozzle}). 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.3\textwidth]{nozzle_sch.png}
-  \caption{Schematic of the nozzle heating circuit.}
-  \label{fig:nozzle}
-\end{figure}
+In the following section we model the nozzle of the 3D printer.
 
-\todo{add nicer drawing of the system}
 The system consists of an electrical and thermodynamical part. A circuit consisting of an inductor $L_n$, capacitor $C_n$ and a heating resistor $R_n$. We choose the current through the inductor and the voltage across the capacitor, $i_{L,n}$ and $u_c$ respectively, as first two states of our system. By solving the three Kirchhoff equations we get the following two first-order differential equations:
 
 \begin{equation}
   \label{eq:noz_el}
-  \begin{aligned}
-    L_n\,\frac{di_{L,n}}{dt} &= u_n - u_c \\
-    C_n\,\frac{du_c}{dt} &= i_{L,n} - \frac{u_c}{R_n(T_r)}
-  \end{aligned}
+    L_n\,\frac{di_{L,n}}{dt} = u_n - u_c, \qquad
+    C_n\,\frac{du_c}{dt} = i_{L,n} - \frac{u_c}{R_n(T_r)}
 \end{equation}
 
 Next, we model the thermal part. Besides the thermal capacitance of the nozzle $C_{t,n}$, given in the task, we also model the thermal capacitance of the resistor $C_r$\footnote{If we do not model the thermal capacitance of the resistor, we end up with a differential-algebraic equation (DAE).}. We choose two additional states, temperature of the resistor ($T_r$) and the temperature of the nozzle ($T_n$). Losses happening between the resistor and the nozzle are described by $R_{t,n}$, and the heat dissipation to the environment and to the filament is modelled with one variable $R_{\mathrm{env}}$. The connection to the electrical part is the heat dissipated by the resistor $P_r = \frac{u_c^2}{R_n(T_r)}$. This gives us the following two equations which with \eqref{eq:noz_el} fully describe the system:
 
 \begin{equation}
   \label{eq:noz_th}
-  \begin{aligned}
-    C_{t,n}\,\frac{dT_n}{dt} &= \frac{T_r - T_n}{R_{t,n}} - \frac{T_n - T_e}{R_{\mathrm{env}}} \\
-    C_r\,\frac{dT_r}{dt} &= P_r - \frac{T_r - T_n}{R_{t,n}}
-  \end{aligned}
+    C_{t,n}\,\frac{dT_n}{dt} = \frac{T_r - T_n}{R_{t,n}} - \frac{T_n - T_e}{R_{\mathrm{env}}}, \qquad
+    C_r\,\frac{dT_r}{dt} = P_r - \frac{T_r - T_n}{R_{t,n}}
 \end{equation}
 
 with
@@ -602,132 +556,158 @@ where $R_0$ is the resistance at the reference temperature $T_0$ and $\alpha$ is
 
 Due to the square voltage term and the temperature dependence of the resistance the system is very non-linear, although the very different time constants of two systems (thermal states change much slower compared to the electrical) can be exploited. Alternatively, the model can reasonably be simplified by assuming a constant resistance. With that formulation we would get two linear systems connected by a single non-linear term.
 
-\clearpage
-
 \subsubsection{Printing a circle of filament}
 
+In this section a 1D distributed parameter model for the cooling of a square cross-section filament on a heating plate and a numerical formulation of the problem are derived.
 
-\subsubsection*{Moving-Boundary Heat Problem}
- 
- \todo{better notation, proper plots, explanation text}
-Cross-section $a \times a$, element length $\Delta L$; three faces to the environment ($T_e$), one face to the heating plate ($T_p$).
- 
-\paragraph{Energy balance}
-\[
-\partial_t u = -\nabla\cdot\phi + f, \qquad u = \rho c\,T, \qquad \phi = -\kappa \nabla T
-\qquad\Longrightarrow\qquad
+\subsubsection*{Modelling the system}
+We take a cross-section of $a \times a$ with length $\Delta L$. Temperature is assumed uniform across the $a \times a$ cross-section to keep the model one dimensional in space. Three faces exchange heat with the environment ($T_e$), and one face with the heating plate ($T_p$).
+
+The problem is modelled using the heat equation~\cite{vandenboom2026modeling}, Fourier's law gives the flux~\eqref{eq:heat_laws}. Writing the energy density as~\eqref{eq:heat_laws} and substituting both into the energy balance yields the heat equation~\eqref{eq:heat_equation}:
+
+\begin{equation}
+\label{eq:heat_laws}
+\partial_t u = -\nabla\cdot\phi + f, \qquad
+u = \rho c\,T, \qquad
+\phi = -\kappa \nabla T
+\end{equation}
+
+\begin{equation}
+\label{eq:heat_equation}
 \partial_t T = \frac{\kappa}{\rho c}\,\nabla^2 T + \frac{f}{\rho c}
-\]
-\[
-[u] = \mathrm{J/m^3}, \qquad [\phi] = \mathrm{W/m^2}, \qquad [f] = \mathrm{W/m^3}
-\]
- 
-\paragraph{Heat exchange}
-\[
+\end{equation}
+
+Secondly, we need to describe the heat exchange of the segment $\Delta L$. Using Newton's cooling law we can express the heat transfer through the surfaces as~\eqref{eq:newton_cooling}. Dividing that by $V$ gives us the heat transfer per unit volume~\eqref{eq:heat_source}.
+
+\begin{equation*}
 \Delta A_e = 3a\,\Delta L, \qquad \Delta A_p = a\,\Delta L, \qquad V = a^2\,\Delta L
-\]
-\[
-\dot Q = K_e\,\Delta A_e\,(T_e - T) + K_p\,\Delta A_p\,(T_p - T)
-\qquad \big[\mathrm{W/(m^2K)}\cdot \mathrm{m^2}\cdot\mathrm{K} = \mathrm{W}\big]
-\]
-\[
-f = \frac{\dot Q}{V} = \frac{1}{a}\Big[\,3K_e\,(T_e - T) + K_p\,(T_p - T)\,\Big]
-\]
- 
-\paragraph{Result}
-\[
-\boxed{\;\partial_t T = k\,\partial_{xx} T + \alpha\,T + \beta\;}
-\]
-\[
+\end{equation*}
+
+\begin{align}
+\dot Q &= K_e\,\Delta A_e\,(T_e - T) + K_p\,\Delta A_p\,(T_p - T)
+  \label{eq:newton_cooling} \\
+f &= \frac{\dot Q}{V} = \frac{1}{a}\Big[\,3K_e\,(T_e - T) + K_p\,(T_p - T)\,\Big]
+  \label{eq:heat_source}
+\end{align}
+
+Substituting everything back into~\eqref{eq:heat_equation}, gives us the final PDE:
+
+\begin{equation}
+\label{eq:filament_pde}
+\boxed{\partial_t T = k\,\partial_{xx} T + \alpha\,T + \beta}
+\end{equation}
+
+\begin{equation*}
 k = \frac{\kappa}{\rho c}, \qquad
 \alpha = -\frac{3K_e + K_p}{a\,\rho c}, \qquad
 \beta = \frac{3K_e T_e + K_p T_p}{a\,\rho c}
-\]
+\end{equation*}
  
-\subsubsection*{2. Front Fixing}
-John Crank, Free and Moving Boundary Problems
-\[
+\subsubsection*{Front Fixing}
+Due to needing to solve the problem while the nozzle is still moving, this becomes a moving boundary problem. A method from~\cite{crank1984free} is used. We introduce a transformation $\xi$, that maps our space to the interval $[0, 1]$, with $s(t)$ being the position of our boundary, and consequently $\dot s(t)$ the speed of the boundary/nozzle.
+
+\begin{equation}
+\label{eq:front_fixing}
 \xi = \frac{x}{s(t)}, \qquad 0 \le \xi \le 1, \qquad
 s(t) = s_0 + s_1 t, \qquad \dot s = s_1
-\]
- 
-\paragraph{Derivatives}
-\[
-\frac{\partial T}{\partial x} = \frac{1}{s}\,\frac{\partial T}{\partial \xi},
+\end{equation}
+
+Applying a change of variable to our equation~\eqref{eq:filament_pde} we get:
+
+\begin{equation*}
+\begin{aligned}
+\frac{\partial T}{\partial x} &= \frac{1}{s}\,\frac{\partial T}{\partial \xi},
 \qquad
-\frac{\partial^2 T}{\partial x^2} = \frac{1}{s^2}\,\frac{\partial^2 T}{\partial \xi^2}
-\]
-\[
+\frac{\partial^2 T}{\partial x^2} = \frac{1}{s^2}\,\frac{\partial^2 T}{\partial \xi^2} \\
 \left(\frac{\partial T}{\partial t}\right)_{\!x}
-= \frac{\partial T}{\partial \xi}\left(\frac{\partial \xi}{\partial t}\right)_{\!x} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
-= -\frac{x\,\dot s}{s^2}\,\frac{\partial T}{\partial \xi} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
-= -\frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi} + \left(\frac{\partial T}{\partial t}\right)_{\!\xi}
-\]
- 
-\paragraph{Transformed equation}
-\[
-\boxed{\;\left(\frac{\partial T}{\partial t}\right)_{\!\xi}
+&= \left(\frac{\partial T}{\partial t}\right)_{\!\xi} + \frac{\partial T}{\partial \xi}\left(\frac{\partial \xi}{\partial t}\right)_{\!x}
+= \left(\frac{\partial T}{\partial t}\right)_{\!\xi} - \frac{x\,\dot s}{s^2}\,\frac{\partial T}{\partial \xi}
+= \left(\frac{\partial T}{\partial t}\right)_{\!\xi} - \frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi}
+\end{aligned}
+\end{equation*}
+
+\begin{equation}
+\label{eq:filament_pde_fixed}
+\boxed{\left(\frac{\partial T}{\partial t}\right)_{\!\xi}
 = \frac{\xi\,\dot s}{s}\,\frac{\partial T}{\partial \xi}
 + \frac{k}{s^2}\,\frac{\partial^2 T}{\partial \xi^2}
-+ \alpha\,T + \beta\;}
-\]
- 
-\subsubsection*{3. Boundary and Initial Conditions}
- 
-\[
-T(1, t) = T_n \quad \text{(nozzle temperature at } x = s(t)\text{)}
-\]
-\[
-\partial_x T(0, t) = 0
-\quad\Longrightarrow\quad
-\frac{T_1^j - T_0^j}{\Delta \xi} = 0
-\quad\Longrightarrow\quad
-T_0^j = T_1^j
-\]
-\[
-T_i^0 = T_n, \qquad s(0) = s_0 \ \text{(small)}
-\]
- 
-\subsubsection*{4. Discretisation (implicit)}
- 
-\[
-\xi_i = i\,\Delta\xi, \quad \Delta \xi = \tfrac{1}{N}, \quad i = 0,\dots,N;
-\qquad t_j = j\,\Delta t; \qquad T_i^j \approx T(\xi_i, t_j)
-\]
-\[
-\frac{\partial T}{\partial t} \approx \frac{T_i^j - T_i^{j-1}}{\Delta t},
++ \alpha\,T + \beta}
+\end{equation}
+
+\subsubsection*{Boundary and Initial Conditions}
+
+With $T(\xi, t)$ we can place necessary boundary conditions for the problem to be solvable. Firstly, the temperature at the endpoint $(\xi = 1)$ at all times equals the temperature of the nozzle which constitutes a Dirichlet condition. Secondly, we assume that the heat dissipation on the $(\xi = 0)$ surface is negligible compared to the whole surface, so a Neumann boundary condition is used to model it insulated. Finally, as seen in~\eqref{eq:front_fixing}, there exists initial length of filament $s_0$, needed to solve the problem, and its temperature at $t=0$ is assumed uniform and equal to the nozzle temperature.
+
+\begin{equation}
+\label{eq:filament_bc}
+T(1, t) = T_n, \qquad
+\partial_\xi T(0, t) = 0, \qquad
+T(\xi, 0) = T_n, \qquad
+s_0 > 0
+\end{equation}
+
+\subsubsection*{Discretisation }
+
+The temperature is discretised on a uniform grid in the transformed coordinate $\xi \in [0,1]$, with spacing $\Delta\xi = 1/N$, and in time with step $\Delta t$. Time is advanced with an implicit (backward) Euler scheme, the diffusion term $\partial_{\xi\xi}T$ uses a second-order central difference, which is symmetric and produces a tridiagonal matrix and the advection term $\partial_\xi T$ uses a first-order upwind difference.
+
+\begin{equation*}
+\xi_i = i\,\Delta\xi, \quad i = 0,\dots,N,
+\qquad t_j = j\,\Delta t, \qquad T_i^j \approx T(\xi_i, t_j)
+\end{equation*}
+
+\begin{equation} 
+\label{eq:fd_approx}
+\left.\frac{\partial T}{\partial t}\right|_i^j \approx \frac{T_i^j - T_i^{j-1}}{\Delta t},
 \qquad
-\frac{\partial T}{\partial \xi} \approx \frac{T_{i+1}^j - T_i^j}{\Delta \xi},
+\left.\frac{\partial T}{\partial \xi}\right|_i^j \approx \frac{T_{i+1}^j - T_i^j}{\Delta \xi},
 \qquad
-\frac{\partial^2 T}{\partial \xi^2} \approx \frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
-\]
-\[
-\gamma_i = \frac{\xi_i\,\dot s\,\Delta t}{s\,\Delta \xi},
+\left.\frac{\partial^2 T}{\partial \xi^2}\right|_i^j \approx \frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
+\end{equation}
+
+\begin{equation}
+\label{eq:filament_discrete}
+\frac{T_i^j - T_i^{j-1}}{\Delta t}
+= \frac{\xi_i\,\dot s}{s}\,\frac{T_{i+1}^j - T_i^j}{\Delta \xi}
++ \frac{k}{s^2}\,\frac{T_{i+1}^j - 2T_i^j + T_{i-1}^j}{\Delta \xi^2}
++ \alpha\,T_i^j + \beta
+\end{equation}
+
+With some substitutions and after inserting the approximations into the transformed PDE gives we get:
+
+\begin{equation*}
+\gamma_i = \frac{\xi_i\,\dot s\,\Delta t}{s\,\Delta \xi} = \frac{i\,\dot s\,\Delta t}{s},
 \qquad
 g = \frac{k\,\Delta t}{s^2\,\Delta \xi^2},
 \qquad s,\ \dot s \ \text{evaluated at } t_j
-\]
-\[
-\boxed{\;T_i^j\big[\,1 + \gamma_i + 2g - \alpha\,\Delta t\,\big]
-= g\,T_{i-1}^j + (\gamma_i + g)\,T_{i+1}^j + T_i^{j-1} + \beta\,\Delta t\;}
-\]
+\end{equation*}
 
- \subsubsection*{Stability}
-\todo{von Neumann probably}
+\begin{equation}
+\label{eq:filament_scheme}
+\boxed{T_i^j\big[\,1 + \gamma_i + 2g - \alpha\,\Delta t\,\big]
+= g\,T_{i-1}^j + (\gamma_i + g)\,T_{i+1}^j + T_i^{j-1} + \beta\,\Delta t}
+\end{equation}
 
-\subsubsection*{5. Linear System at $t = t_j$}
+We can see that we arrive at an implicit formulation, where we need to solve a linear system at each time step.
+
+\subsubsection*{Linear System at $t = t_j$}
+
+Writing down a couple of terms we can see that we get a tridiagonal matrix, with the first row representing the Neumann condition and the last the Dirichlet condition.  
  
-\[
-d_i = 1 + \gamma_i + 2g - \alpha\,\Delta t, \qquad e_i = \gamma_i + g
-\]
-\[
+\begin{equation*}
+d_i = 1 + \gamma_i + 2g - \alpha\,\Delta t, \qquad e_i = \gamma_i + g,
+\qquad
+T_0^j = T_1^j, \qquad T_N^j = T_n
+\end{equation*}
+
+\begin{equation}
+\label{eq:filament_linear_system}
 \begin{bmatrix}
 1 & -1 & & & & \\
 -g & d_1 & -e_1 & & & \\
  & -g & d_2 & -e_2 & & \\
  & & \ddots & \ddots & \ddots & \\
  & & & -g & d_{N-1} & -e_{N-1} \\
- & & & & 0 & 1
+ & & & & & 1
 \end{bmatrix}
 \begin{bmatrix}
 T_0^j \\ T_1^j \\ T_2^j \\ \vdots \\ T_{N-1}^j \\ T_N^j
@@ -736,19 +716,23 @@ T_0^j \\ T_1^j \\ T_2^j \\ \vdots \\ T_{N-1}^j \\ T_N^j
 \begin{bmatrix}
 0 \\ T_1^{j-1} + \beta\,\Delta t \\ T_2^{j-1} + \beta\,\Delta t \\ \vdots \\ T_{N-1}^{j-1} + \beta\,\Delta t \\ T_n
 \end{bmatrix}
-\]
+\end{equation}
+
+The fact that the matrix is tridiagonal allows us to use specialised solvers like \textit{scipy.\allowbreak linalg.\allowbreak solve\_banded}.
  
-%--------------------------------------------------------------
-\subsubsection*{6. After the Boundary Stops (Closed Ring)}
+
+\subsubsection*{After the Boundary Stops (Closed Ring)}
+After the boundary stops moving, i.e. the circle is closed the matrix needs to be slightly modified, which causes it to lose its tridiagonal form. At the time point of contact the first and last node are connected and become one node, and its temperature is set to the mean of both of them. As the boundary stops moving $\dot{s}$ and consequently $\gamma_i$ terms disappear.
  
-\[
+\begin{equation*}
 \dot s = 0 \;\Rightarrow\; \gamma_i = 0, \qquad s = L, \qquad
-T_N^j \equiv T_0^j \ \text{(first and last node coincide)}
-\]
-\[
+T_N^j \equiv T_0^j, \qquad
+g = \frac{k\,\Delta t}{L^2\,\Delta \xi^2}, \qquad
 d = 1 + 2g - \alpha\,\Delta t
-\]
-\[
+\end{equation*}
+
+\begin{equation}
+\label{eq:filament_ring_system}
 \begin{bmatrix}
 d & -g & & & -g \\
 -g & d & -g & & \\
@@ -763,18 +747,32 @@ T_0^j \\ T_1^j \\ \vdots \\ T_{N-2}^j \\ T_{N-1}^j
 \begin{bmatrix}
 T_0^{j-1} + \beta\,\Delta t \\ T_1^{j-1} + \beta\,\Delta t \\ \vdots \\ T_{N-2}^{j-1} + \beta\,\Delta t \\ T_{N-1}^{j-1} + \beta\,\Delta t
 \end{bmatrix}
-\]
+\end{equation}
 First step after connection:
-\[
+\begin{equation*}
 T_0^{j-1} \leftarrow \tfrac{1}{2}\big(T_0^{j-1} + T_N^{j-1}\big)
-\]
+\end{equation*}
 
-\todo{Choose and display the chosen model parameters}
+\subsubsection*{Simulation}
+
+The derived model was simulated in \textit{Python} with the parameters listed in Table~\ref{tab:filament_params} (Appendix~\ref{app:filament_params}).
+
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\textwidth]{initial_pde_plot.png}
-  \caption{INITIAL PLOT, CHANGE.}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{filament_T_x.pdf}
+    \caption{Physical space $x$.}
+    \label{fig:filament_T_x}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{filament_T_xi.pdf}
+    \caption{Transformed space $\xi$.}
+    \label{fig:filament_T_xi}
+  \end{subfigure}
+  \caption{Temperature of the filament while printing and after the ring is closed.}
   \label{fig:pde_plot}
 \end{figure}
-
