@@ -4,7 +4,7 @@
 \subsection{Filament Replacement}
 \label{subsec:fsm_filament}
 
-This section presents the high-level control of the filament replacement, modelled as a Mealy machine since the next state and the output (status message and retry counter) both depend on the current state and input. The machine listens to the external events $C$ (a new colour is requested) and $F$ (the current spool is finished) and to the success or failure feedback of the low-level subsystems. It consists of two coupled sub-machines that are updated together: a \emph{printing} machine (idle, running or paused) and a \emph{filament replacement} machine that sequences the steps of Q2.1. A failed step is retried up to three times before the replacement is aborted.
+The filament replacement is modelled with two machines: a printing machine and a filament replacement machine.
 
 \subsubsection{Formal Machine Definition}
 \label{subsubsec:fsm_definition}
@@ -15,7 +15,7 @@ The FSM is defined as the Mealy machine
 \mathcal{M} = (Q, \Sigma, \Lambda, \delta, \lambda, q_0).
 \end{equation}
 
-\paragraph{States.} The state $q = (p, f, r)$ of printing state, filament replacement state and retries left,
+\paragraph{States.} The state $q = (p, f, r)$ is the printing state, the filament replacement state and the retries left,
 \begin{equation}
 \label{eq:fsm_states}
 \begin{aligned}
@@ -25,15 +25,12 @@ P &= \{\texttt{IDLE}, \texttt{IN\_PROG}, \texttt{PAUSED}\}, \\
 R &= \{0, 1, 2, 3\},
 \end{aligned}
 \end{equation}
-where \texttt{MOVE} is moving to the wipe location, \texttt{WIPE} is wiping the excess filament, \texttt{COOL} is the nozzle heat switched off, \texttt{LOAD} is loading the new filament and \texttt{HEAT} is the nozzle heat switched on. Saving the head location (step~1 of Q2.1) is the action on entering \texttt{MOVE}, and resuming the print (step~7) is the action on leaving \texttt{HEAT}. The initial state is $q_0 = (\texttt{IDLE}, \texttt{IDLE}, 3)$.
+where \texttt{MOVE} moves to the wipe location, \texttt{WIPE} wipes the excess filament, \texttt{COOL} switches the nozzle heat off, \texttt{LOAD} loads the new filament and \texttt{HEAT} switches the nozzle heat on. The head location is saved on entering \texttt{MOVE} and the print is resumed on leaving \texttt{HEAT}. The initial state is $q_0 = (\texttt{IDLE}, \texttt{IDLE}, 3)$.
 
 % \todo[inline]{The notebook also declares \texttt{ABORTED}, \texttt{FAILED} and \texttt{COMPLETED} printing states, but the transition table has no transitions for them, so they are left out of $P$ here.}
 
 
-\paragraph{Inputs.} At each step the FSM can accept a pair of inputs $\sigma = (e, y)$, where $e$ represents external event i.e $C$, $F$ or nothing. 
-$y$ represents the feedback of the outcome of the current filament state being executed. It is represented by $\mathrm{ok}_k$ if step $k$ succeeded and $\mathrm{fail}_k$ if it failed, for each of the five replacement steps $k \in K = \mathcal{F} \setminus \{\texttt{IDLE}\} = \{\texttt{MOVE}, \texttt{WIPE}, \texttt{COOL}, \texttt{LOAD}, \texttt{HEAT}\}$. For example, $\mathrm{fail}_{\texttt{WIPE}}$ means that the wiping did not succeed.
-
-In total there are $3$ external events and $1 + 2 \cdot 5 = 11$ feedback values, so the input alphabet has $3 \cdot 11 = 33$ elements:
+\paragraph{Inputs.} An input is a pair $\sigma = (e, y)$. Here $e$ is the external event ($C$, $F$ or nothing) and $y$ is the feedback of the current step: $\mathrm{ok}_k$ or $\mathrm{fail}_k$ for each step $k \in K = \{\texttt{MOVE}, \texttt{WIPE}, \texttt{COOL}, \texttt{LOAD}, \texttt{HEAT}\}$, or nothing. This gives $3 \cdot 11 = 33$ inputs:
 \begin{equation}
 \label{eq:fsm_inputs}
 \begin{aligned}
@@ -43,30 +40,11 @@ Y &= \{\varepsilon,\ \mathrm{ok}_{\texttt{MOVE}},\, \mathrm{fail}_{\texttt{MOVE}
 \end{aligned}
 \end{equation}
 
-\paragraph{Outputs.} The output alphabet $\lambda$ represents the set of output messages sent to the user on each transition. For example,\ ``filament change in progress'', ``$k$ successful'', ``$k$ failure, trying again'', ``filament change process failed, initiate filament change again'' and ``filament change already in progress''.
+\paragraph{Outputs.} The outputs $\Lambda$ are messages to the user, for example ``filament change in progress'', ``$k$ successful'', ``$k$ failure, trying again'', ``filament change process failed, initiate filament change again'' and ``filament change already in progress''.
 
+\paragraph{Transition and output functions.} The transition function $\delta : Q \times \Sigma \to Q$ and output function $\lambda : Q \times \Sigma \to \Lambda$ are given by Table~\ref{tab:fsm_table} and Figures~\ref{fig:fsm_printing} and~\ref{fig:fsm_filament}.
 
-
-\paragraph{Transition and output functions.} The transition function $\delta : Q \times \Sigma \to Q$ and output function $\lambda : Q \times \Sigma \to \Lambda$ are given by the transition table and  below. Here $\mathrm{next}(k)$ is the step after $k$ in the order $\texttt{MOVE} \to \texttt{WIPE} \to \texttt{COOL} \to \texttt{LOAD} \to \texttt{HEAT}$, and $r$ is the number of retries left, reset to $3$ on every new step. 
-
-
-The following cases can occur, depending on the filament replacement state $f$ and the input $\sigma = (e, y)$:
-\begin{itemize}[noitemsep]
-  \item \textbf{Start.} If $f = \texttt{IDLE}$ and the event $e$ is $C$ or $F$, the replacement starts: the machine moves to \texttt{MOVE}, and a running print ($p = \texttt{IN\_PROG}$) is paused, while an idle or already paused printer keeps its printing state.
-  \item \textbf{Event during a replacement.} If $f \neq \texttt{IDLE}$ and $e$ is $C$ or $F$, the event is ignored and the state is unchanged; the output message is ``filament change already in progress''.
-  \item \textbf{Step succeeded.} On $\mathrm{ok}_k$ in step $f = k$, the machine moves on to $\mathrm{next}(k)$, with $r = 3$.
-  \item \textbf{Last step succeeded.} On $\mathrm{ok}_{\texttt{HEAT}}$ the replacement is finished: the machine returns to $f = \texttt{IDLE}$, and a paused print is resumed ($p = \texttt{PAUSED} \to \texttt{IN\_PROG}$).
-  \item \textbf{Step failed, retries left.} On $\mathrm{fail}_k$ with $r > 0$, the machine stays in step $k$ and the number of retries is reduced by one, $r' = r - 1$, so the step is tried again.
-  \item \textbf{Step failed, no retries left.} On $\mathrm{fail}_k$ with $r = 0$, the replacement is aborted: the machine returns to $f = \texttt{IDLE}$ with $r = 3$, and the message asks the user to start the filament change again.
-  \item \textbf{Anything else.} An input for which the table has no row (e.g.\ a feedback from a step that is not active) leaves the state unchanged and returns the message \texttt{NO MATCHING TRANSITION}.
-\end{itemize}
-Each of these cases has its own output message, which is the output $\lambda$ of the transition.
-
-\paragraph{Implementation.} The machine is implemented as a state transition table loaded into a pandas dataframe in \texttt{fsm.ipynb}. A snapshot of the table is shown in Table~\ref{tab:fsm_table}. 
-
-Every row describes one of the transition cases defined above. The first five columns (printing state, filament state, retries left, external input and system feedback) are the conditions that the current state and input must satisfy, and the last four columns are the output state, the retries left and the output message. The entry \texttt{X} represents \texttt{DON'T CARE} condition where the current state of this variable does not influence the output in any manner. An empty input cell means that the signal is absent and must match exactly. The rows are checked from top to bottom and the first row whose conditions all hold is applied; if no row matches, the state is left unchanged and the message \texttt{NO MATCHING TRANSITION} is returned.
-
-The machine is implemented as a state transition table loaded into a pandas dataframe in \texttt{fsm.ipynb}. A snapshot of the table is shown in Table~\ref{tab:fsm_table}. 
+\paragraph{Implementation.} The machine is a transition table (Table~\ref{tab:fsm_table}) in \texttt{fsm.ipynb}. The rows matching the current state and input are checked and the corresponding outputs are determined. \texttt{X} means \texttt{DON'T CARE}.
 
 \begin{table}[H]
 \small
@@ -94,7 +72,7 @@ The model was checked against a set of different test cases (\texttt{test\_cases
 \subsubsection{Transition }
 \label{subsubsec:fsm_}
 
-The two sub-machines are shown in Figures~\ref{fig:fsm_printing} and~\ref{fig:fsm_filament}. Transitions are labelled as \emph{input}~[\emph{guard condition}]~/~\emph{action}, where $r$ is the number of retries left. A $C$ or $F$ event starts the replacement only when the filament replacement machine is in its idle state; while a replacement is running, further $C$ or $F$ events are ignored (self-loop with the message ``filament change already in progress''). If a $C$ or $F$ event arrives in the same step as a feedback signal, the external event takes precedence and the feedback is discarded.
+The two sub-machines are shown in Figures~\ref{fig:fsm_printing} and~\ref{fig:fsm_filament}. Transitions are labelled \emph{input}~[\emph{guard}]~/~\emph{action}, where $r$ is the number of retries left. A $C$ or $F$ event starts a replacement only when the filament machine is idle; otherwise it is ignored. If it arrives together with a feedback signal, the event takes precedence.
 
 
 \begin{figure}[H]
@@ -148,7 +126,7 @@ The two sub-machines are shown in Figures~\ref{fig:fsm_printing} and~\ref{fig:fs
 \subsection{Parked Detection}
 \label{subsec:dfa_parked}
 
-The head is parked at the origin when both the horizontal and the vertical motion have hit their end of line, i.e.\ a motion was commanded but the corresponding motor did not rotate. The detector is the Deterministic Finite Automaton (DFA)
+The head is parked at the origin when both motions have hit their end of line, i.e.\ a motion was commanded but the motor did not rotate. This is detected by the DFA
 \begin{equation}
 \label{eq:dfa_tuple}
 \mathcal{A} = (Q_A, \Sigma_A, \delta_A, q_{A,0}, F_A)
