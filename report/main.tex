@@ -1,15 +1,12 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 \input{preamble}
 
 \begin{document}
 
+\pagenumbering{Alph} % unique page anchors for the title page
 \input{frontmatter/titlepage}
-\setcounter{section}{-1}
-\pagenumbering{roman}
+\pagenumbering{arabic}
 
-\input{chapters/introduction}
-\clearpage
-\pagenumbering{arabic} % page 1 starts at Physical Modelling
 \input{chapters/physical_modelling}
 \input{chapters/finite_state_machine}
 \input{chapters/hybrid_system}

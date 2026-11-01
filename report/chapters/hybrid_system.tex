@@ -12,7 +12,7 @@ It combines three smaller machines running in parallel: the nozzle machine $\mat
 
 In mode $q$ the continuous state flows as $\dot{x} = f(q, x, u)$. An edge is taken as soon as its guard is true, and $z^{+}$ denotes the value of $z$ right after the transition. There are no separate invariants.
 
-\paragraph{$Q$: set of modes.} One mode from each machine, $Q = Q_{\mathcal{N}} \times Q_{\mathcal{P}} \times Q_{\mathcal{M}}$:
+\paragraph{\texorpdfstring{$Q$}{Q}: set of modes.} One mode from each machine, $Q = Q_{\mathcal{N}} \times Q_{\mathcal{P}} \times Q_{\mathcal{M}}$:
 \begin{align*}
     Q_{\mathcal{N}} &= \{\text{COOL}, \text{HEATING\_UP}, \text{HEATED}, \text{COOLING}\}, \\
     Q_{\mathcal{P}} &= \{\text{IDLE}, \text{WAIT\_HOT}, \text{TRAVEL\_TO\_START}, \text{PRINT\_PATH}, \\
@@ -22,7 +22,7 @@ In mode $q$ the continuous state flows as $\dot{x} = f(q, x, u)$. An edge is tak
 \end{align*}
 WAIT\_HOT, TRAVEL\_TO\_START and PRINT\_PATH together form the mode IN\_PROGRESS of $\mathcal{P}$.
 
-\paragraph{$X$: continuous state.} The printer state $x_p = (x, y, \dot{x}, \dot{y}, T_n, T_r)$ (head position and velocity, nozzle and heater temperatures) plus the variables of Table~\ref{tab:q3_vars}. We use the reduced plant, where the fast electrical dynamics are instantaneous ($L_m \approx 0$, $u_c = u_n$).
+\paragraph{\texorpdfstring{$X$}{X}: continuous state.} The printer state $x_p = (x, y, \dot{x}, \dot{y}, T_n, T_r)$ (head position and velocity, nozzle and heater temperatures) plus the variables of Table~\ref{tab:q3_vars}. We use the reduced plant, where the fast electrical dynamics are instantaneous ($L_m \approx 0$, $u_c = u_n$).
 % \todo[inline]{Explain what the reduced plant is (\texttt{sys\_reduced}): which states are removed and why, and how it relates to the full model.}
 
 \begin{table}[H]
@@ -45,7 +45,7 @@ WAIT\_HOT, TRAVEL\_TO\_START and PRINT\_PATH together form the mode IN\_PROGRESS
     \end{tabular}
 \end{table}
 
-\paragraph{$U = U_D \times U_C$: inputs.} $U_D = \{C, \mathit{START}\}$ are the user events (colour change, start). The continuous inputs $U_C$ are listed in Table~\ref{tab:q3_inputs}. They are fixed by the mode, as given in Section~\ref{sec:q3_part2}. The motors are driven by $\mathcal{M}$ when it is not IDLE and by $\mathcal{P}$ otherwise.
+\paragraph{\texorpdfstring{$U = U_D \times U_C$}{U = UD x UC}: inputs.} $U_D = \{C, \mathit{START}\}$ are the user events (colour change, start). The continuous inputs $U_C$ are listed in Table~\ref{tab:q3_inputs}. They are fixed by the mode, as given in Section~\ref{sec:q3_part2}. The motors are driven by $\mathcal{M}$ when it is not IDLE and by $\mathcal{P}$ otherwise.
 
 
 \begin{table}[H]
@@ -64,17 +64,17 @@ WAIT\_HOT, TRAVEL\_TO\_START and PRINT\_PATH together form the mode IN\_PROGRESS
     \end{tabular}
 \end{table}
 
-\paragraph{$Y$: outputs.} The outputs are the head position $(x, y)$, the nozzle temperature $T_n$, the length of filament used $L$, and the current mode of each machine $(q_{\mathcal{N}}, q_{\mathcal{P}}, q_{\mathcal{M}})$. Here the mode of a machine is the step it is currently in, for example HEATED for $\mathcal{N}$, PAUSED for $\mathcal{P}$ or WIPING for $\mathcal{M}$.
+\paragraph{\texorpdfstring{$Y$}{Y}: outputs.} The outputs are the head position $(x, y)$, the nozzle temperature $T_n$, the length of filament used $L$, and the current mode of each machine $(q_{\mathcal{N}}, q_{\mathcal{P}}, q_{\mathcal{M}})$. Here the mode of a machine is the step it is currently in, for example HEATED for $\mathcal{N}$, PAUSED for $\mathcal{P}$ or WIPING for $\mathcal{M}$.
 
-\paragraph{$f$: flow map.} The reduced CoreXY plant (\texttt{sys\_reduced}): a damped head mass driven by the two coupled motors, and a two-node nozzle thermal model heated with power $u_n^2 / R_n(T_r)$. The other variables follow Table~\ref{tab:q3_vars}.
+\paragraph{\texorpdfstring{$f$}{f}: flow map.} The reduced CoreXY plant (\texttt{sys\_reduced}): a damped head mass driven by the two coupled motors, and a two-node nozzle thermal model heated with power $u_n^2 / R_n(T_r)$. The other variables follow Table~\ref{tab:q3_vars}.
 
-\paragraph{$h$: output map.} $h$ computes the outputs from the current mode $q = (q_{\mathcal{N}}, q_{\mathcal{P}}, q_{\mathcal{M}})$ and continuous state $x$, so $y_{out} = h(q, x)$. It does not change the values; it only selects which quantities are observed:
+\paragraph{\texorpdfstring{$h$}{h}: output map.} $h$ computes the outputs from the current mode $q = (q_{\mathcal{N}}, q_{\mathcal{P}}, q_{\mathcal{M}})$ and continuous state $x$, so $y_{out} = h(q, x)$. It does not change the values; it only selects which quantities are observed:
 \[
     y_{out} = h(q, x) = \bigl(\, x,\; y,\; T_n,\; L,\; q_{\mathcal{N}},\; q_{\mathcal{P}},\; q_{\mathcal{M}} \,\bigr).
 \]
 The first four entries are the head position $(x, y)$, $T_n$ and $L$, read directly from $x_p$ and $L$. The last three come from $q$. The remaining variables ($\dot{x}$, $\dot{y}$, $T_r$, $\tau$, $k$, the saved coordinates and the flags) are internal and not part of the output.
 
-\paragraph{$\mathit{Init}$: initial state.} $\mathit{Init} = \{(q_0, x_0)\}$ contains a single element:
+\paragraph{\texorpdfstring{$\mathit{Init}$}{Init}: initial state.} $\mathit{Init} = \{(q_0, x_0)\}$ contains a single element:
 \begin{align*}
     q_0 &= (\text{COOL}, \text{IDLE}, \text{IDLE}), \\
     x_p(0) &= (x, y, \dot{x}, \dot{y}, T_n, T_r) = (0, 0, 0, 0, T_e, T_e), \\
@@ -104,20 +104,20 @@ where $T_e$ is the ambient temperature.
     \end{tabular}
 \end{table}
 
-\paragraph{$E$: edges.} $E \subseteq Q \times Q$ is the set of allowed transitions $e = (q, q')$. It is the union of the edges of the three machines, which are listed in Section~\ref{sec:q3_part2}:
+\paragraph{\texorpdfstring{$E$}{E}: edges.} $E \subseteq Q \times Q$ is the set of allowed transitions $e = (q, q')$. It is the union of the edges of the three machines, which are listed in Section~\ref{sec:q3_part2}:
 \begin{align*}
     E &= E_{\mathcal{N}} \cup E_{\mathcal{P}} \cup E_{\mathcal{M}}, \\
     e &= (q, q'), \quad \text{e.g. } e = (\text{COOL}, \text{HEATING\_UP}) \in E_{\mathcal{N}}.
 \end{align*}
 
-\paragraph{$G$: guards.} $G(e)$ is the condition on $x$ and $u$ under which the edge $e$ is taken:
+\paragraph{\texorpdfstring{$G$}{G}: guards.} $G(e)$ is the condition on $x$ and $u$ under which the edge $e$ is taken:
 \begin{align*}
     G(\text{COOL}, \text{HEATING\_UP}) &= \mathit{req}, \\
     G(\text{HEATING\_UP}, \text{HEATED}) &= (T_n \ge T_{hi})_{>1}.
 \end{align*}
 The edges IN\_PROGRESS $\to$ PAUSED in $\mathcal{P}$ and IDLE $\to$ MOVING\_TO\_WIPE in $\mathcal{M}$ share the guard $C^{\uparrow} \vee F$, so they fire together.
 
-\paragraph{$R$: resets.} $R(e)$ gives the values $z^{+}$ of the variables right after $e$ is taken:
+\paragraph{\texorpdfstring{$R$}{R}: resets.} $R(e)$ gives the values $z^{+}$ of the variables right after $e$ is taken:
 \begin{align*}
     R(\text{IDLE}, \text{WAIT\_HOT}) &: \; \mathit{req}^{+} = \text{true}, \\
     R(\text{PRINT\_PATH}, \text{PRINT\_PATH}) &: \; k^{+} = k + 1.
@@ -131,11 +131,11 @@ Every edge also resets $\tau^{+} = 0$ (not repeated in the tables), and any vari
 
 Each machine is shown as a flowchart that gives its modes, the inputs $u$ used in each mode, and the edges with their guard $G$ and reset $R$, followed by a short explanation.
 
-\subsubsection{Nozzle Machine $\mathcal{N}$}
+\subsubsection{Nozzle Machine \texorpdfstring{$\mathcal{N}$}{N}}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{figures/q31/clean/nozzle.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/q31/clean/nozzle.pdf}
     \caption{Nozzle machine, in the notation of this report. The dashed modes are failure modes of the implementation, which are not part of $H$. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
     \label{fig:q31_clean_nozzle}
 \end{figure}
@@ -146,11 +146,11 @@ Each machine is shown as a flowchart that gives its modes, the inputs $u$ used i
     \item When $\mathit{req}$ is withdrawn the heater is switched off (COOLING), and after $T_n < T_{hi}$ for more than $\SI{1}{s}$ it returns to COOL with $\mathit{heated}$ false.
 \end{itemize}
 
-\subsubsection{Printer Machine $\mathcal{P}$}
+\subsubsection{Printer Machine \texorpdfstring{$\mathcal{P}$}{P}}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/q31/clean/printer.pdf}
+    \includegraphics[width=0.85\textwidth]{figures/q31/clean/printer.pdf}
     \caption{Printer machine, in the notation of this report. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
     \label{fig:q31_clean_printer}
 \end{figure}
@@ -161,13 +161,13 @@ Each machine is shown as a flowchart that gives its modes, the inputs $u$ used i
     \item On $C^{\uparrow}$ or $F$ the printer pauses from any sub-mode of IN\_PROGRESS and saves the head position $(x_s, y_s)$. When the change is done it re-enters WAIT\_HOT, so it waits for the nozzle, travels back to $\mathrm{path}(k{-}1)$ and continues from point $k$.
 \end{itemize}
 
-\subsubsection{Filament Machine $\mathcal{M}$}
+\subsubsection{Filament Machine \texorpdfstring{$\mathcal{M}$}{M}}
 
 The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $t_l$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{figures/q31/clean/filament.pdf}
+    \includegraphics[width=0.75\textwidth]{figures/q31/clean/filament.pdf}
     \caption{Filament machine, in the notation of this report. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
     \label{fig:q31_clean_filament}
 \end{figure}
@@ -205,7 +205,8 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 \begin{multicols}{2}
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/1_head_path.pdf}
+    \includegraphics[width=0.65\linewidth]{figures/q31/final_test/1_head_path.pdf}
+    \captionsetup{hypcap=false}
     \captionof{figure}{Head path: first spool (red), unwanted colour (orange), after the colour change (green) and travel moves.}
     \label{fig:q31_final_path}
 \end{minipage}
@@ -213,7 +214,8 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/2_nozzle_temperature.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/2_nozzle_temperature.pdf}
+    \captionsetup{hypcap=false}
     \captionof{figure}{Nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
     \label{fig:q31_final_temp}
 \end{minipage}
@@ -221,7 +223,8 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/3_nozzle_mode.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/3_nozzle_mode.pdf}
+    \captionsetup{hypcap=false}
     \captionof{figure}{Nozzle machine mode.}
     \label{fig:q31_final_nozzle}
 \end{minipage}
@@ -229,7 +232,8 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/4_printer_mode.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/4_printer_mode.pdf}
+    \captionsetup{hypcap=false}
     \captionof{figure}{Printer machine mode.}
     \label{fig:q31_final_printer}
 \end{minipage}
@@ -237,7 +241,8 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/5_filament_mode.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/5_filament_mode.pdf}
+    \captionsetup{hypcap=false}
     \captionof{figure}{Filament machine mode.}
     \label{fig:q31_final_filament}
 \end{minipage}
@@ -245,7 +250,8 @@ The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $
 
 \noindent\begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/q31/final_test/6_filament_extruded.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/q31/final_test/6_filament_extruded.pdf}
+    \captionsetup{hypcap=false}
     \captionof{figure}{Extruded filament length $L$ against $L_{spool}$.}
     \label{fig:q31_final_extruded}
 \end{minipage}
