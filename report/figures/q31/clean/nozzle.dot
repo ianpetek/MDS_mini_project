@@ -1,0 +1,21 @@
+digraph "Nozzle" {
+  graph [rankdir=TB, compound=true, nodesep=0.5, ranksep=0.9, fontname="Times", fontsize=18, pad=0.15];
+  node  [shape=box, style="rounded", fontname="Times", fontsize=18, margin="0.2,0.1"];
+  edge  [fontname="Times", fontsize=15, arrowsize=0.8];
+"init" [shape=point,width=0.12,label=""]; "init" -> "COOL";
+"COOL" [label=<<B>COOL</B><BR/><FONT POINT-SIZE="14">nozzle off</FONT>>];
+"HEATING_UP" [label=<<B>HEATING_UP</B><BR/><FONT POINT-SIZE="14">nozzle heating</FONT>>];
+"HEATED" [label=<<B>HEATED</B><BR/><FONT POINT-SIZE="14">nozzle heating</FONT>>];
+"COOLING" [label=<<B>COOLING</B><BR/><FONT POINT-SIZE="14">nozzle off</FONT>>];
+"COOL" -> "HEATING_UP" [label=<<I>req</I>>];
+"HEATING_UP" -> "HEATED" [label=<(<I>T</I><SUB><I>n</I></SUB> &ge; <I>T</I><SUB><I>hi</I></SUB>)<SUB>&gt;1</SUB><BR/><FONT POINT-SIZE="13">/ <I>heated</I><SUP>+</SUP> = true</FONT>>];
+"COOLING" -> "HEATED" [dir=back, label=<&not;<I>req</I>>];
+"COOL" -> "COOLING" [dir=back, label=<(<I>T</I><SUB><I>n</I></SUB> &lt; <I>T</I><SUB><I>hi</I></SUB>)<SUB>&gt;1</SUB><BR/><FONT POINT-SIZE="13">/ <I>heated</I><SUP>+</SUP> = false</FONT>>];
+{rank=same; "COOL"; "HEATING_UP"}
+{rank=same; "COOLING"; "HEATED"}
+"too_hot" [label=<<B>TOO_HOT</B>>, style="rounded,dashed"];
+"cooled" [label=<<B>COOLED_BUT_<BR/>NOT_SUPPOSED_TO</B>>, style="rounded,dashed"];
+"HEATED" -> "cooled" [style=dashed, label=<<I>T</I><SUB><I>n</I></SUB> &lt; <I>T</I><SUB><I>hi</I></SUB>>];
+"HEATED" -> "too_hot" [style=dashed, label=<<I>T</I><SUB><I>n</I></SUB> &gt; <I>T</I><SUB><I>max</I></SUB>>];
+{rank=same; "too_hot"; "cooled"}
+}
