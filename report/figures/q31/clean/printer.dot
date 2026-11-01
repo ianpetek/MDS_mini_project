@@ -1,0 +1,22 @@
+digraph "Printer" {
+  graph [rankdir=TB, compound=true, nodesep=1.6, ranksep=0.9, fontname="Times", fontsize=18, pad=0.15];
+  node  [shape=box, style="rounded", fontname="Times", fontsize=18, margin="0.2,0.1"];
+  edge  [fontname="Times", fontsize=15, arrowsize=0.8];
+"init" [shape=point,width=0.12,label=""]; "init" -> "IDLE";
+"IDLE" [label=<<B>IDLE</B><BR/><FONT POINT-SIZE="14">motors off, extruder off<BR/>r = (0, 0)</FONT>>];
+"COMPLETED" [label=<<B>COMPLETED</B><BR/><FONT POINT-SIZE="14">motors off, extruder off</FONT>>];
+"PAUSED" [label=<<B>PAUSED</B><BR/><FONT POINT-SIZE="14">motors on, extruder off<BR/>r = (<I>x</I><SUB><I>s</I></SUB>, <I>y</I><SUB><I>s</I></SUB>)</FONT>>];
+subgraph "cluster_IP" { label=<<B>IN_PROGRESS</B>>; style="rounded"; labeljust="l"; fontsize=18;
+"init2" [shape=point,width=0.12,label=""]; "init2" -> "WAIT_HOT";
+"WAIT_HOT" [label=<<B>WAIT_HOT</B><BR/><FONT POINT-SIZE="14">motors off, extruder off</FONT>>];
+"TRAVEL_TO_START" [label=<<B>TRAVEL_TO_START</B><BR/><FONT POINT-SIZE="14">motors on, extruder off<BR/>r = path(max(k&minus;1, 1))</FONT>>];
+"PRINT_PATH" [label=<<B>PRINT_PATH</B><BR/><FONT POINT-SIZE="14">motors on, extruder on<BR/>r = path(k)</FONT>>];
+}
+"IDLE" -> "WAIT_HOT" [label=<<I>START</I><BR/><FONT POINT-SIZE="13">/ <I>req</I><SUP>+</SUP> = true</FONT>>, lhead="cluster_IP"];
+"WAIT_HOT" -> "TRAVEL_TO_START" [label=<<I>heated</I>>];
+"TRAVEL_TO_START" -> "PRINT_PATH" [label=<<I>arr</I><SUB>&gt;0.5</SUB><BR/><FONT POINT-SIZE="13">/ <I>k</I><SUP>+</SUP> = max(<I>k</I>, 2)</FONT>>];
+"PRINT_PATH" -> "PRINT_PATH" [label=<<I>k</I> &lt; <I>n</I> &and; <I>arr</I><BR/><FONT POINT-SIZE="13">/ <I>k</I><SUP>+</SUP> = <I>k</I> + 1</FONT>>];
+"PRINT_PATH" -> "COMPLETED" [label=<<I>k</I> = <I>n</I> &and; <I>arr</I><SUB>&gt;0.5</SUB><BR/><FONT POINT-SIZE="13">/ <I>req</I><SUP>+</SUP> = false</FONT>>];
+"WAIT_HOT" -> "PAUSED" [label=<C<SUP>&uarr;</SUP> &or; F<BR/><FONT POINT-SIZE="13">/ <I>paused</I><SUP>+</SUP> = true, <I>req</I><SUP>+</SUP> = false,<BR/>(<I>x</I><SUB><I>s</I></SUB><SUP>+</SUP>, <I>y</I><SUB><I>s</I></SUB><SUP>+</SUP>) = (<I>x</I>, <I>y</I>)</FONT>>, ltail="cluster_IP"];
+"PAUSED" -> "WAIT_HOT" [label=<<I>change_done</I> &and;<BR/>&not;<I>change_active</I><BR/><FONT POINT-SIZE="13">/ <I>paused</I><SUP>+</SUP> = false, <I>req</I><SUP>+</SUP> = true</FONT>>, lhead="cluster_IP"];
+}

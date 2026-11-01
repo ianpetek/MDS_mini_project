@@ -129,20 +129,32 @@ PlantState.Elements = elems;
 %% Filament change (Q2.1 / Q3.1)
 p.wipe_x      = 0;     % wipe-tower location [m]
 p.wipe_y      = 0;
-p.tol         = 0.005; % "arrived" tolerance [m]
+p.tol         = 0.0005; % "arrived" tolerance [m]
 p.t_timeout   = 30;    % a step counts as failed after this [s]
 p.t_wipe      = 3;     % time spent wiping [s]
 p.t_load      = 2;     % time to load new filament [s]
 p.max_retries = 3;
 %% Print path: one row per point, columns [x y] in metres
 th = linspace(0, 2*pi, 41)';            % example: circle, 40 segments
-p.path = [0.0 0.0;
-    0.05 0.0;
-    0.05 0.05;
-    0.0 0.05;
-    0.0 0.0];
-p.n_path   = size(p.path, 1);           
+       
 p.tol_pass = 0.003;                     % "close enough, next point" [m]
+
+%% Print path: square, with 5 extra points on each side
+corners = [0.05 0.05;     % start corner, then counter-clockwise
+    0.25 0.05;
+    0.25 0.25;
+    0.05 0.25;
+    0.05 0.05];    % back to the start, to close the square
+n_mid = 5;                % intermediate points per side
+
+p.path = corners(1, :);
+for i = 1:size(corners, 1) - 1
+    s = linspace(0, 1, n_mid + 2)';      % 0, 1/6, ..., 1
+    s = s(2:end);                         % skip the corner already in the path
+    p.path = [p.path; corners(i, :) + s .* (corners(i+1, :) - corners(i, :))];
+end
+p.n_path = size(p.path, 1);               % 1 + 4*(5+1) = 25 points
+
 
 PAUSE_pressed = [0 0];
 

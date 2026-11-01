@@ -1,3 +1,285 @@
 \section{Hybrid System}
 \label{sec:hybrid_system}
 
+\subsection{Part 1: Formal Definition}
+\label{sec:q3_part1}
+
+We define the hybrid state machine as
+\[
+    H = (Q, X, U, Y, f, h, \mathit{Init}, E, G, R).
+\]
+It combines three smaller machines running in parallel: the nozzle machine $\mathcal{N}$, the printer machine $\mathcal{P}$ and the filament machine $\mathcal{M}$.
+
+In mode $q$ the continuous state flows as $\dot{x} = f(q, x, u)$. An edge is taken as soon as its guard is true, and $z^{+}$ denotes the value of $z$ right after the transition. There are no separate invariants.
+
+\paragraph{$Q$: set of modes.} One mode from each machine, $Q = Q_{\mathcal{N}} \times Q_{\mathcal{P}} \times Q_{\mathcal{M}}$:
+\begin{align*}
+    Q_{\mathcal{N}} &= \{\text{COOL}, \text{HEATING\_UP}, \text{HEATED}, \text{COOLING}\}, \\
+    Q_{\mathcal{P}} &= \{\text{IDLE}, \text{WAIT\_HOT}, \text{TRAVEL\_TO\_START}, \text{PRINT\_PATH}, \\
+    &\qquad \text{PAUSED}, \text{COMPLETED}\}, \\
+    Q_{\mathcal{M}} &= \{\text{IDLE}, \text{MOVING\_TO\_WIPE}, \text{WIPING}, \text{NOZZLE\_COOLING}, \\
+    &\qquad \text{LOADING\_FILAMENT}, \text{NOZZLE\_HEATING}, \text{READY\_TO\_RESUME}\}.
+\end{align*}
+WAIT\_HOT, TRAVEL\_TO\_START and PRINT\_PATH together form the mode IN\_PROGRESS of $\mathcal{P}$.
+
+\paragraph{$X$: continuous state.} The printer state $x_p = (x, y, \dot{x}, \dot{y}, T_n, T_r)$ (head position and velocity, nozzle and heater temperatures) plus the variables of Table~\ref{tab:q3_vars}. We use the reduced plant, where the fast electrical dynamics are instantaneous ($L_m \approx 0$, $u_c = u_n$).
+\todo[inline]{Explain what the reduced plant is (\texttt{sys\_reduced}): which states are removed and why, and how it relates to the full model.}
+
+\begin{table}[H]
+    \centering
+    \small
+    \caption{Variables in $X$ besides the printer state $x_p$.}
+    \label{tab:q3_vars}
+    \begin{tabular}{@{}lp{0.60\textwidth}@{}}
+        \toprule
+        Symbol & Meaning \\
+        \midrule
+        $L$ & Length of filament used so far \\
+        $\tau$ & Time spent in the current mode; a timer with $\dot{\tau} = 1$ that is reset to $0$ on every edge \\
+        $k$ & Index of the current point in the path, which is an array of coordinates that the printer follows; $k \in \{1, \dots, n\}$ \\
+        $(x_s, y_s)$ & Coordinates of the head saved when the printer is paused \\
+        $\mathit{req}$, $\mathit{heated}$ & Request to the nozzle to start heating; indicator that the nozzle is heated \\
+        $\mathit{paused}$ & Indicator that the printer is in the paused state \\
+        $\mathit{change\_active}$, $\mathit{change\_done}$ & Indicator that a filament change is in progress; indicator that a filament change has finished \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{$U = U_D \times U_C$: inputs.} $U_D = \{C, \mathit{START}\}$ are the user events (colour change, start). The continuous inputs $U_C$ are listed in Table~\ref{tab:q3_inputs}. They are fixed by the mode, as given in Section~\ref{sec:q3_part2}. The motors are driven by $\mathcal{M}$ when it is not IDLE and by $\mathcal{P}$ otherwise.
+
+
+\begin{table}[H]
+    \centering
+    \small
+    \caption{Continuous inputs $U_C$.}
+    \label{tab:q3_inputs}
+    \begin{tabular}{@{}llp{0.52\textwidth}@{}}
+        \toprule
+        Symbol & Code variable & Meaning \\
+        \midrule
+        $(u_{mL}, u_{mR}, u_n)$ & \texttt{mode\_motor}, \texttt{mode\_nozzle} & Left and right motor voltages and heater voltage; each is either off or on, depending on the mode \\
+        Extruder switch & \texttt{is\_extruding} & Whether the extruder is on \\
+        $r = (x_c, y_c)$ & \texttt{command\_x}, \texttt{command\_y} & Commanded head position that the motors drive towards \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{$Y$: outputs.} The outputs are the head position $(x, y)$, the nozzle temperature $T_n$, the length of filament used $L$, and the current mode of each machine $(q_{\mathcal{N}}, q_{\mathcal{P}}, q_{\mathcal{M}})$. Here the mode of a machine is the step it is currently in, for example HEATED for $\mathcal{N}$, PAUSED for $\mathcal{P}$ or WIPING for $\mathcal{M}$.
+
+\paragraph{$f$: flow map.} The reduced CoreXY plant (\texttt{sys\_reduced}): a damped head mass driven by the two coupled motors, and a two-node nozzle thermal model heated with power $u_n^2 / R_n(T_r)$. The other variables follow Table~\ref{tab:q3_vars}.
+
+\paragraph{$h$: output map.} $h$ computes the outputs from the current mode $q = (q_{\mathcal{N}}, q_{\mathcal{P}}, q_{\mathcal{M}})$ and continuous state $x$, so $y_{out} = h(q, x)$. It does not change the values; it only selects which quantities are observed:
+\[
+    y_{out} = h(q, x) = \bigl(\, x,\; y,\; T_n,\; L,\; q_{\mathcal{N}},\; q_{\mathcal{P}},\; q_{\mathcal{M}} \,\bigr).
+\]
+The first four entries are the head position $(x, y)$, $T_n$ and $L$, read directly from $x_p$ and $L$. The last three come from $q$. The remaining variables ($\dot{x}$, $\dot{y}$, $T_r$, $\tau$, $k$, the saved coordinates and the flags) are internal and not part of the output.
+
+\paragraph{$\mathit{Init}$: initial state.} $\mathit{Init} = \{(q_0, x_0)\}$ contains a single element:
+\begin{align*}
+    q_0 &= (\text{COOL}, \text{IDLE}, \text{IDLE}), \\
+    x_p(0) &= (x, y, \dot{x}, \dot{y}, T_n, T_r) = (0, 0, 0, 0, T_e, T_e), \\
+    (L, \tau, k) &= (0, 0, 1), \\
+    (\mathit{req}, \mathit{heated}, \mathit{paused}, \mathit{change\_active}, \mathit{change\_done}) &= (\text{false}, \text{false}, \text{false}, \text{false}, \text{false}),
+\end{align*}
+where $T_e$ is the ambient temperature.
+
+\paragraph{Shorthand for the guards.} The conditions in Table~\ref{tab:q3_shorthand} are used to keep the guards short.
+
+\begin{table}[H]
+    \centering
+    \normalsize
+    \caption{Shorthand used in the guards.}
+    \label{tab:q3_shorthand}
+    \begin{tabular}{@{}lp{0.62\textwidth}@{}}
+        \toprule
+        Symbol & Meaning \\
+        \midrule
+        $\mathit{arr}$ & Head has arrived at its target: $\lvert x - x_c\rvert < \varepsilon$ and $\lvert y - y_c\rvert < \varepsilon$, with $\varepsilon = \SI{0.5}{mm}$ \\
+        $F$ & Spool is empty: $L \ge L_{spool}$ \\
+        $T_{hi}$ & Temperature at which the nozzle counts as hot, $T_{hi} = \SI{350}{K}$ \\
+        $\mathit{arr}_{>0.5}$ & $\mathit{arr}$ has held for more than $\SI{0.5}{s}$ \\
+        $(T_n \ge T_{hi})_{>1}$ & $T_n \ge T_{hi}$ has held for more than $\SI{1}{s}$ \\
+        $C^{\uparrow}$ & Button $C$ has just been pressed (rising edge, $0 \to 1$) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{$E$: edges.} $E \subseteq Q \times Q$ is the set of allowed transitions $e = (q, q')$. It is the union of the edges of the three machines, which are listed in Section~\ref{sec:q3_part2}:
+\begin{align*}
+    E &= E_{\mathcal{N}} \cup E_{\mathcal{P}} \cup E_{\mathcal{M}}, \\
+    e &= (q, q'), \quad \text{e.g. } e = (\text{COOL}, \text{HEATING\_UP}) \in E_{\mathcal{N}}.
+\end{align*}
+
+\paragraph{$G$: guards.} $G(e)$ is the condition on $x$ and $u$ under which the edge $e$ is taken:
+\begin{align*}
+    G(\text{COOL}, \text{HEATING\_UP}) &= \mathit{req}, \\
+    G(\text{HEATING\_UP}, \text{HEATED}) &= (T_n \ge T_{hi})_{>1}.
+\end{align*}
+The edges IN\_PROGRESS $\to$ PAUSED in $\mathcal{P}$ and IDLE $\to$ MOVING\_TO\_WIPE in $\mathcal{M}$ share the guard $C^{\uparrow} \vee F$, so they fire together.
+
+\paragraph{$R$: resets.} $R(e)$ gives the values $z^{+}$ of the variables right after $e$ is taken:
+\begin{align*}
+    R(\text{IDLE}, \text{WAIT\_HOT}) &: \; \mathit{req}^{+} = \text{true}, \\
+    R(\text{PRINT\_PATH}, \text{PRINT\_PATH}) &: \; k^{+} = k + 1.
+\end{align*}
+Every edge also resets $\tau^{+} = 0$ (not repeated in the tables), and any variable not listed keeps its value, $z^{+} = z$.
+
+\subsection{Part 2: The Machines}
+\label{sec:q3_part2}
+
+Each machine is shown as a flowchart that gives its modes, the inputs $u$ used in each mode, and the edges with their guard $G$ and reset $R$, followed by a short explanation.
+
+\subsubsection{Nozzle Machine $\mathcal{N}$}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/q31/clean/nozzle.pdf}
+    \caption{Nozzle machine, in the notation of this report. The dashed modes are failure modes of the implementation, which are not part of $H$. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
+    \label{fig:q31_clean_nozzle}
+\end{figure}
+
+\begin{itemize}[nosep]
+    \item The nozzle starts in COOL with the heater off. When heating is requested ($\mathit{req}$), it moves to HEATING\_UP and heats.
+    \item After $T_n \ge T_{hi}$ has held for more than $\SI{1}{s}$ it is HEATED and $\mathit{heated}$ becomes true. The machine keeps heating and does not regulate $T_n$ further.
+    \item When $\mathit{req}$ is withdrawn the heater is switched off (COOLING), and after $T_n < T_{hi}$ for more than $\SI{1}{s}$ it returns to COOL with $\mathit{heated}$ false.
+\end{itemize}
+
+\subsubsection{Printer Machine $\mathcal{P}$}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/q31/clean/printer.pdf}
+    \caption{Printer machine, in the notation of this report. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
+    \label{fig:q31_clean_printer}
+\end{figure}
+
+\begin{itemize}[nosep]
+    \item $\mathit{START}$ requests heating and the printer waits in WAIT\_HOT until the nozzle is $\mathit{heated}$.
+    \item The head then travels to the start of the path and prints it point by point, increasing $k$ each time it arrives. After the last point the printer is COMPLETED.
+    \item On $C^{\uparrow}$ or $F$ the printer pauses from any sub-mode of IN\_PROGRESS and saves the head position $(x_s, y_s)$. When the change is done it re-enters WAIT\_HOT, so it waits for the nozzle, travels back to $\mathrm{path}(k{-}1)$ and continues from point $k$.
+\end{itemize}
+
+\subsubsection{Filament Machine $\mathcal{M}$}
+
+The wipe location is $(x_w, y_w)$, the wipe time is $t_w$ and the load time is $t_l$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/q31/clean/filament.pdf}
+    \caption{Filament machine, in the notation of this report. Edge labels show the guard $G$, and below it the reset $R$ after the slash. Inputs $u$ are given in each mode.}
+    \label{fig:q31_clean_filament}
+\end{figure}
+
+\begin{itemize}[nosep]
+    \item On $C^{\uparrow}$ or $F$ the change starts: the head moves to the wipe location $(x_w, y_w)$ and wipes with the extruder on for $t_w = \SI{3}{s}$.
+    \item Heating is then switched off ($\mathit{req}$ false). Once the nozzle has cooled ($\lnot\,\mathit{heated}$), new filament is loaded for $t_l = \SI{5}{s}$.
+    \item Heating is requested again. When the nozzle is $\mathit{heated}$ and the printer is paused, the head returns to $(x_s, y_s)$ and $\mathit{change\_done}$ becomes true, which releases the printer.
+\end{itemize}
+
+\paragraph{Note.} The nozzle flowchart shows two failure modes of the implementation (dashed). The implementation also has a \textit{FAILED} mode and a manual pause and resume input. The definitions above ignore these failure modes and all retries, and cover only the successful filament change.
+
+\subsection{Part 3: Drawing a Square}
+\label{sec:q3_part3}
+
+\paragraph{Path.} The square is given to the printer as a list of points $\mathrm{path}(k) = (x_k, y_k)$, $k = 1, \dots, n$, with $n = 25$. It runs counter-clockwise through the corners $(0.05, 0.05)$, $(0.25, 0.05)$, $(0.25, 0.25)$, $(0.05, 0.25)$ and back to the start, in metres, with five intermediate points on each side (a spacing of $\SI{33.3}{mm}$). In \textit{PRINT\_PATH} the head is commanded to $\mathrm{path}(k)$ and, once $\mathit{arr}$ holds, the index is increased, so the square is drawn point by point.
+
+\todo[inline]{Q3.2: the position is computed from the motor angle sensors only; describe how, and add the rotated square (bonus).}
+
+\paragraph{Cases.} The same square is drawn twice with a filament change in the middle of the print:
+\begin{enumerate}[nosep]
+    \item $C$ is triggered half-way through the print;
+    \item $F$ happens: the spool is empty half-way through the print.
+\end{enumerate}
+In both cases the head is moved to the wipe location $(0, 0.5)$\,m, and the part printed before the change is shown in red and the part after it in green.
+
+\subsubsection{Case 1: $C$ Triggered}
+\label{sec:q31_case1}
+$C$ is pressed at $t\approx\SI{69.6}{s}$, half-way through the print (after two sides of the square). The printer pauses, the head wipes at $(0,\,0.5)$\,m, the filament is loaded and the nozzle reheats, and printing resumes at $t\approx\SI{96.0}{s}$ (red to green). The square is complete at $t\approx\SI{163}{s}$.
+
+\todo[inline]{Comment on the plots.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/q31/case1_colour_change/1_head_path.pdf}
+    \caption{Case 1. Head path: printed before the change (red), after (green), and travel moves.}
+    \label{fig:q31_case1_path}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case1_colour_change/2_nozzle_temperature.pdf}
+        \caption{Nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case1_colour_change/3_nozzle_mode.pdf}
+        \caption{Nozzle machine.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case1_colour_change/4_printer_mode.pdf}
+        \caption{Printer machine.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case1_colour_change/5_filament_mode.pdf}
+        \caption{Filament machine.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case1_colour_change/6_filament_extruded.pdf}
+        \caption{Extruded filament length $L$ against $L_{spool}$.}
+    \end{subfigure}
+    \caption{Case 1. Nozzle temperature, machine modes and extruded length.}
+    \label{fig:q31_case1_modes}
+\end{figure}
+
+\subsubsection{Case 2: $F$ Triggered}
+\label{sec:q31_case2}
+$C$ is never pressed. The spool holds half of the filament needed for the square, so $F$ occurs at $t\approx\SI{69.6}{s}$ and the same change sequence runs, resuming at $t\approx\SI{96.0}{s}$. The replacement spool has the same length, so $F$ occurs a second time at $t\approx\SI{158}{s}$ (resuming at $\SI{185.6}{s}$) and the square is complete at $t\approx\SI{191}{s}$.
+
+\todo[inline]{Comment on the plots.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/q31/case2_filament_runout/1_head_path.pdf}
+    \caption{Case 2. Head path: printed before the change (red), after (green), and travel moves.}
+    \label{fig:q31_case2_path}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case2_filament_runout/2_nozzle_temperature.pdf}
+        \caption{Nozzle temperature $T_n$ with the thresholds $T_{hi}$ and $T_{max}$.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case2_filament_runout/3_nozzle_mode.pdf}
+        \caption{Nozzle machine.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case2_filament_runout/4_printer_mode.pdf}
+        \caption{Printer machine.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case2_filament_runout/5_filament_mode.pdf}
+        \caption{Filament machine.}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{figures/q31/case2_filament_runout/6_filament_extruded.pdf}
+        \caption{Extruded filament length $L$ against $L_{spool}$.}
+    \end{subfigure}
+    \caption{Case 2. Nozzle temperature, machine modes and extruded length.}
+    \label{fig:q31_case2_modes}
+\end{figure}
+
+
+\subsubsection{Discussion}
+\todo[inline]{Compare both cases with the FSM of Chapter~2: order of filament states, nozzle cooling and reheating, resumption point.}

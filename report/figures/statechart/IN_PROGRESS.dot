@@ -1,0 +1,22 @@
+digraph "IN_PROGRESS" {
+  graph [rankdir=LR, nodesep=0.5, ranksep=0.9, fontname="Times", fontsize=11, pad=0.1];
+  node  [shape=box, style="rounded", fontname="Times", fontsize=11, margin="0.15,0.06"];
+  edge  [fontname="Times", fontsize=9, arrowsize=0.7];
+  "PRINT_PATH" [label="PRINT PATH"];
+  "TRAVEL_TO_START" [label="TRAVEL TO START"];
+  "WAIT_HOT" [label="WAIT HOT"];
+  "__init" [shape=point, width=0.12, label=""];
+  "__init" -> "WAIT_HOT";
+  "out_COMPLETED" [shape=plaintext, label="to COMPLETED", fontsize=9];
+  "out_FAILED" [shape=plaintext, label="to FAILED", fontsize=9];
+  "PRINT_PATH" -> "out_FAILED" [label="at_wall"];
+  "PRINT_PATH" -> "out_COMPLETED" [label="k == p.n_path &&
+duration(arrived) > 0.5"];
+  "TRAVEL_TO_START" -> "out_FAILED" [label="duration(arrived) > 0.5 &&
+~failed"];
+  "PRINT_PATH" -> "PRINT_PATH" [label="k < p.n_path && arrived"];
+  "TRAVEL_TO_START" -> "PRINT_PATH" [label="duration(arrived) > 0.5 &&
+~failed"];
+  "PRINT_PATH" -> "TRAVEL_TO_START" [label="at_wall"];
+  "WAIT_HOT" -> "TRAVEL_TO_START" [label="heated"];
+}

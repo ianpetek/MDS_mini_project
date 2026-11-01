@@ -1,6 +1,6 @@
 % Packages and document-wide settings
 \usepackage[margin=2.5cm,headheight=14pt]{geometry}
-\usepackage{amsmath,booktabs,siunitx,enumitem}
+\usepackage{amsmath,booktabs,siunitx,enumitem,multirow}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{float}
@@ -10,6 +10,10 @@
 \usepackage{bm}
 \usepackage{tikz}
 \usepackage{todonotes}
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,arrows.meta,calc,fit}
+\tikzset{fsm/.style={->, >={Stealth[round]}, shorten >=1pt, auto, font=\small,
+  every state/.style={draw, rounded corners, minimum size=1cm, inner sep=3pt}}}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
 
 \graphicspath{{images/}}
