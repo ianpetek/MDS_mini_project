@@ -1,0 +1,19 @@
+digraph "NozzleMachine" {
+  graph [rankdir=LR, compound=true, nodesep=0.45, ranksep=0.8, fontname="Times", fontsize=11, pad=0.1];
+  node  [shape=box, style="rounded", fontname="Times", fontsize=11, margin="0.15,0.06"];
+  edge  [fontname="Times", fontsize=9, arrowsize=0.7];
+  "__init_NozzleMachine" [shape=point, width=0.1, label=""];
+  "__init_NozzleMachine" -> "Cool";
+  "Cooling" [label="Cooling"];
+  "HeatingUp" [label="HeatingUp"];
+  "cooled_but_not_supposed_to" [label="cooled but not supposed to"];
+  "Heated" [label="Heated"];
+  "Cool" [label="Cool"];
+  "too_hot" [label="too hot"];
+  "Cool" -> "HeatingUp" [label="request_heated_nozzle"];
+  "Cooling" -> "Cool" [label="duration(state.T_n < 350) > 1"];
+  "Heated" -> "Cooling" [label="~request_heated_nozzle"];
+  "HeatingUp" -> "Heated" [label="duration(state.T_n >=350) > 1"];
+  "Heated" -> "cooled_but_not_supposed_to" [label="state.T_n < 350"];
+  "Heated" -> "too_hot" [label="state.T_n > 370"];
+}
